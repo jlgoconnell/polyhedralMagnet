@@ -57,11 +57,11 @@ rr = N.*C-M.*D;
 y1 = rr(:,1:2);
 y2 = rr(:,3:4);
 myBx = (2*[1,-1,-1,1].*m./sqrtm.*log(R)-[1,1,-1,-1].*log((M.^2+N.^2)./(C.^2+D.^2)))/2;
-myBx = MdotN/(4*pi)*sum(myBx,2);
+Bx = MdotN/(4*pi)*sum(myBx,2);
 myBy = [-1,1,1,-1]./sqrtm.*log(-x+xq+m.*(c+m.*xq-y)+sqrtm.*S);
-myBy = MdotN/(4*pi)*sum(myBy,2);
+By = MdotN/(4*pi)*sum(myBy,2);
 myBz = atan2(y1.*x2-y2.*x1,x1.*x2+y1.*y2);
-myBz = MdotN/(4*pi)*(sum(myBz,2));
+Bz = MdotN/(4*pi)*(sum(myBz,2));
 
 B = [myBx,myBy,myBz];
 
@@ -69,7 +69,8 @@ figure;
 fill3(vertices([1,2,4,3],1),vertices([1,2,4,3],2),vertices([1,2,4,3],3),'r');
 hold on;
 grid on;
-quiver3(obspt(:,1),obspt(:,2),obspt(:,3),myBx,myBy,myBz);
+quiver3(obspt(:,1),obspt(:,2),obspt(:,3),Bx,By,Bz);
+axis equal
 
 end
 

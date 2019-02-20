@@ -45,7 +45,7 @@ for i = 1:length(Fac)
     % Decompose into trapezia
     trappts = facepts;
     for j = 1:length(facepts)-1
-        for k = 1:length(facepts)-1
+        for k = 1:length(facepts)
             if (facepts(k,1)-facepts(j,1))*(facepts(k,1)-facepts(j+1,1)) < -1*eps
                 m = (facepts(j+1,2)-facepts(j,2))/(facepts(j+1,1)-facepts(j,1));
                 c = facepts(j,2)-m*facepts(j,1);
