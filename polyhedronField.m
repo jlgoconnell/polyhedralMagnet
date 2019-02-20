@@ -43,6 +43,7 @@ for i = 1:length(Fac)
     thisz = facepts(1,3);
     
     % Decompose into trapezia
+    facepts(end+1,:) = facepts(1,:);
     trappts = facepts;
     for j = 1:length(facepts)-1
         for k = 1:length(facepts)
@@ -54,7 +55,7 @@ for i = 1:length(Fac)
         end
     end
     trappts = sortrows(trappts);
-    xpts = uniquetol(trappts(:,1));
+    trappts = uniquetol(trappts,'ByRows',true);
     traplength = length(trappts);
     for j = 1:traplength
         if sum(abs(trappts(j,1)-trappts(:,1))<eps) == 1
