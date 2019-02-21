@@ -44,12 +44,16 @@ Told = Fold;
 
 % Choose a suitable starting mesh parameter
 i = 10;
+ctr = 0;
+oldC = Inf;
+C = 0;
 
-while max(abs([F,T]-[Fold,Told])) > tolerance && toc < timeout
+while max(abs(C-oldC)) > tolerance && toc < timeout
     
     % Temp values to compare error for convergence
     Fold = F;
     Told = T;
+    oldC = C;
     
     % Set up and subdivide mesh
     Fac = minConvexHull(verticesB);
@@ -75,8 +79,27 @@ while max(abs([F,T]-[Fold,Told])) > tolerance && toc < timeout
     T = sum(MdotN.*cross(myleverpoint,B).*dA);
     
     i = i + 1;
+    ctr = ctr + 1;
+    
+    C = [(exp(1)*F-Fold)/(exp(1)-1),(exp(1)*T-Told)/(exp(1)-1)];
+    
+%     if i > 11
+%     figure(1);
+%     plot(i-1:i,[Fold(1),F(1)],'r');
+%     hold on;
+%     figure(2);
+%     plot(i-1:i,[Fold(2),F(2)],'k');
+%     hold on;
+%     figure(3);
+%     plot(i-1:i,[Fold(3),F(3)],'b');
+%     hold on;
+%     end
     
 end
+
+F = C(1:3);
+T = C(4:6);
+ctr
 
 toc
 
