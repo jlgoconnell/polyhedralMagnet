@@ -1,5 +1,25 @@
 
-% 
+% Function to estimate the force and torque between two polyhedral
+% permanent magnets, both with constant uniform magnetisation. Let one
+% magnet be magnet A and the other be magnet B. This function calculates
+% the force and torque on magnet B.
+%
+% Inputs:
+% verticesA: The vertices of one magnet in an (n x 3) matrix.
+% verticesB: The vertices of the magnet we are calculating the force and
+% torque on in an (n x 3) matrix.
+% magA: The magnetisation vector of magnet A in Teslas.
+% magB: The magnetisation vector of magnet B in Teslas.
+% torquepoint: The point about which the torque on magnet B is calculated.
+% tolerance: The maximum difference between the torque and force before
+% convergence is reached.
+% timeout: The maximum time this function is allowed to run for. After
+% this, the function will finish the current iteration then return the
+% results for the current iteration.
+%
+% Outputs:
+% F: A vector representing the x, y, and z forces on magnet B.
+% T: A vector representing the x, y, and z torques on magnet B.
 
 function [F,T] = polyhedronForce(verticesA,verticesB,magA,magB,torquepoint,tolerance,timeout,varargin)
 
