@@ -45,15 +45,17 @@ Told = Fold;
 % Choose a suitable starting mesh parameter
 i = 10;
 ctr = 0;
-oldC = Inf;
-C = 0;
+oldC = 0;
+D = Inf;
 
-while max(abs(C-oldC)) > tolerance && toc < timeout
+figure;
+
+while max(abs(D-oldC)) > tolerance && toc < timeout
     
     % Temp values to compare error for convergence
-    Fold = F;
-    Told = T;
-    oldC = C;
+    Fold = F(end,:);
+    Told = T(end,:);
+    oldC = D;
     
     % Set up and subdivide mesh
     Fac = minConvexHull(verticesB);
@@ -74,31 +76,54 @@ while max(abs(C-oldC)) > tolerance && toc < timeout
     B = polyhedronField(verticesA,magA,obspt);
     
     % Calculate force and torque
-    F = sum(B.*MdotN.*dA,1);
+    F(end+1,:) = sum(B.*MdotN.*dA,1);
     myleverpoint = obspt-torquepoint;
-    T = sum(MdotN.*cross(myleverpoint,B).*dA);
+    T(end+1,:) = sum(MdotN.*cross(myleverpoint,B).*dA);
     
     i = i + 1;
     ctr = ctr + 1;
     
-    C = [(exp(1)*F-Fold)/(exp(1)-1),(exp(1)*T-Told)/(exp(1)-1)];
+%     C = [(exp(1)*F(end,:)-Fold)/(exp(1)-1),(exp(1)*T(end,:)-Told)/(exp(1)-1)];
     
-%     if i > 11
-%     figure(1);
-%     plot(i-1:i,[Fold(1),F(1)],'r');
-%     hold on;
-%     figure(2);
-%     plot(i-1:i,[Fold(2),F(2)],'k');
-%     hold on;
-%     figure(3);
-%     plot(i-1:i,[Fold(3),F(3)],'b');
-%     hold on;
-%     end
+    if ctr >= 2
+        D = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
+    else
+        D = zeros(1,6);
+    end
+    
+    if ctr > 1
+        subplot(2,3,1);
+        plot(i-1:i,[F(end-1,1),F(end,1)],'r',i,D(1),'r.');
+        hold on;
+        grid on;
+        subplot(2,3,2);
+        plot(i-1:i,[F(end-1,2),F(end,2)],'k',i,D(2),'k.');
+        hold on;
+        grid on;
+        subplot(2,3,3);
+        plot(i-1:i,[F(end-1,3),F(end,3)],'b',i,D(3),'b.');
+        hold on;
+        grid on;
+        subplot(2,3,4);
+        plot(i-1:i,[T(end-1,1),T(end,1)],'r',i,D(4),'r.');
+        hold on;
+        grid on;
+        subplot(2,3,5);
+        plot(i-1:i,[T(end-1,2),T(end,2)],'k',i,D(5),'k.');
+        hold on;
+        grid on;
+        subplot(2,3,6);
+        plot(i-1:i,[T(end-1,3),T(end,3)],'b',i,D(6),'b.');
+        hold on;
+        grid on;
+    end
     
 end
 
-F = C(1:3);
-T = C(4:6);
+max(abs([F(end,:),T(end,:)]-[Fold,Told]))
+
+F = D(1:3);
+T = D(4:6);
 ctr
 
 toc
