@@ -43,7 +43,7 @@ Fold = 2*[tolerance,tolerance,tolerance];
 Told = Fold;
 
 % Choose a suitable starting mesh parameter
-i = 1;
+i = 10;
 
 while max(abs([F,T]-[Fold,Told])) > tolerance && toc < timeout
     
@@ -74,7 +74,7 @@ while max(abs([F,T]-[Fold,Told])) > tolerance && toc < timeout
     myleverpoint = obspt-torquepoint;
     T = sum(MdotN.*cross(myleverpoint,B).*dA);
     
-    i = i + 1
+    i = i + 1;
     
 end
 
