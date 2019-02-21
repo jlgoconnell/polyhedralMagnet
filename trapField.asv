@@ -47,10 +47,16 @@ S = sqrt((x-xq).^2+(y-m.*xq-c).^2+(z-zd).^2);
 negS = S.*[1,-1,1,-1];
 M = (z-zd).^2.*(m.*(m.*xq+c-y)+xq-x+m.*negS);
 N = -(z-zd).*((c+m.*x-y).*(c+negS+m.*xq-y)+(z-zd).^2);
-C = (c+m.*x-y).^2.*(xq-x)+(z-zd).^2.*(m.^2.*(x-xq)+2*m.*(c-y+m.*x));
+C = (xq-x).*(y-c-m.*x).^2-m.*(z-zd).^2.*(2*(y-c)-3*x+m.*xq);
 D = (z-zd).*(-(c-y).^2+2*m.*(xq-2*x).*(c-y)+m.^2.*x.*(-3*x+2*xq)+m.^2.*(z-zd).^2);
 R = c.*m-x+xq+m.^2.*xq-m.*y+sqrtm.*S;
-myBx = (2*[-1,1,1,-1].*m./sqrtm.*log(R)+[1,1,-1,-1].*log((M.^2+N.^2)./(C.^2+D.^2)));
+rr = (M.^2+N.^2)./(C.^2+D.^2);
+x1 = R(:,1:2);
+x2 = R(:,3:4);
+y1 = rr(:,1:2);
+y2 = rr(:,3:4);
+myBx = [-1,1].*2.*m(:,[1,3])./sqrtm(:,[1,3]).*log(x1./x2)+log(y1./y2);
+myBx2 = (2*[-1,1,1,-1].*m./sqrtm.*log(R)+[1,1,-1,-1].*log((M.^2+N.^2)./(C.^2+D.^2)));
 Bx = MdotN/(8*pi)*sum(myBx,2);
 myBy = -[-1,1,1,-1]./sqrtm.*log(-x+xq+m.*(c+m.*xq-y)+sqrtm.*S);
 By = MdotN/(4*pi)*sum(myBy,2);
@@ -64,6 +70,13 @@ myBz = -atan2(y1.*x2-y2.*x1,x1.*x2+y1.*y2);
 Bz = MdotN/(4*pi)*(sum(myBz,2));
 
 B = [Bx,By,Bz];
+
+figure;
+fill3(vertices([1,2,4,3],1),vertices([1,2,4,3],2),vertices([1,2,4,3],3),'r');
+hold on;
+grid on;
+quiver3(obspt(:,1),obspt(:,2),obspt(:,3),Bx,By,Bz,1);
+axis equal
 
 end
 
