@@ -21,7 +21,7 @@
 % F: A vector representing the x, y, and z forces on magnet B.
 % T: A vector representing the x, y, and z torques on magnet B.
 
-function [F,T] = polyhedronForce(verticesA,verticesB,magA,magB,torquepoint,tolerance,timeout,varargin)
+function [F,T,D,t] = polyhedronForce(verticesA,verticesB,magA,magB,torquepoint,tolerance,timeout,varargin)
 
 % If missing arguments:
 if nargin < 7
@@ -41,21 +41,22 @@ F = [0,0,0];
 T = [0,0,0];
 Fold = 2*[tolerance,tolerance,tolerance];
 Told = Fold;
+t = [];
 
 % Choose a suitable starting mesh parameter
-i = 10;
+i = 1;
 ctr = 0;
 oldC = 0;
 D = Inf;
 
-figure;
+% figure;
 
-while max(abs(D-oldC)) > tolerance && toc < timeout
-    
+while max(abs(D(end,:)-oldC)) > tolerance && toc < timeout
+    max(abs(D(end,:)-oldC))
     % Temp values to compare error for convergence
     Fold = F(end,:);
     Told = T(end,:);
-    oldC = D;
+    oldC = D(end,:);
     
     % Set up and subdivide mesh
     Fac = minConvexHull(verticesB);
@@ -83,47 +84,62 @@ while max(abs(D-oldC)) > tolerance && toc < timeout
     i = i + 1;
     ctr = ctr + 1;
     
-%     C = [(exp(1)*F(end,:)-Fold)/(exp(1)-1),(exp(1)*T(end,:)-Told)/(exp(1)-1)];
-    
     if ctr >= 2
-        D = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
+        D(end+1,:) = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
     else
-        D = zeros(1,6);
+        D(end+1,1:6) = zeros(1,6);
     end
     
-    if ctr > 1
-        subplot(2,3,1);
-        plot(i-1:i,[F(end-1,1),F(end,1)],'r',i,D(1),'r.');
-        hold on;
-        grid on;
-        subplot(2,3,2);
-        plot(i-1:i,[F(end-1,2),F(end,2)],'k',i,D(2),'k.');
-        hold on;
-        grid on;
-        subplot(2,3,3);
-        plot(i-1:i,[F(end-1,3),F(end,3)],'b',i,D(3),'b.');
-        hold on;
-        grid on;
-        subplot(2,3,4);
-        plot(i-1:i,[T(end-1,1),T(end,1)],'r',i,D(4),'r.');
-        hold on;
-        grid on;
-        subplot(2,3,5);
-        plot(i-1:i,[T(end-1,2),T(end,2)],'k',i,D(5),'k.');
-        hold on;
-        grid on;
-        subplot(2,3,6);
-        plot(i-1:i,[T(end-1,3),T(end,3)],'b',i,D(6),'b.');
-        hold on;
-        grid on;
-    end
+    t(end+1,1) = toc;
+    
+%     if ctr > 1
+%         subplot(2,3,1);
+%         plot(ctr-1:ctr,[F(end-1,1),F(end,1)],'r');
+%         hold on;
+%         plot(ctr,D(end,1),'r.');
+%         grid on;
+%         ylabel('Fx');
+%         subplot(2,3,2);
+%         plot(ctr-1:ctr,[F(end-1,2),F(end,2)],'k');
+%         hold on;
+%         plot(ctr,D(end,2),'k.');
+%         grid on;
+%         ylabel('Fy');
+%         subplot(2,3,3);
+%         plot(ctr-1:ctr,[F(end-1,3),F(end,3)],'b');
+%         hold on;
+%         plot(ctr,D(end,3),'b.');
+%         grid on;
+%         ylabel('Fz');
+%         subplot(2,3,4);
+%         plot(ctr-1:ctr,[T(end-1,1),T(end,1)],'r');
+%         hold on;
+%         plot(ctr,D(end,4),'r.');
+%         grid on;
+%         ylabel('Tx');
+%         subplot(2,3,5);
+%         plot(ctr-1:ctr,[T(end-1,2),T(end,2)],'k');
+%         hold on;
+%         plot(ctr,D(end,5),'k.');
+%         grid on;
+%         ylabel('Ty');
+%         subplot(2,3,6);
+%         plot(ctr-1:ctr,[T(end-1,3),T(end,3)],'b');
+%         hold on;
+%         plot(ctr,D(end,6),'b.');
+%         grid on;
+%         ylabel('Tz');
+%     end
     
 end
 
 max(abs([F(end,:),T(end,:)]-[Fold,Told]))
 
-F = D(1:3);
-T = D(4:6);
+% F = D(1:3);
+% T = D(4:6);
+
+F = F(2:end,:);
+T = T(2:end,:);
 ctr
 
 toc
