@@ -21,7 +21,7 @@
 % F: A vector representing the x, y, and z forces on magnet B.
 % T: A vector representing the x, y, and z torques on magnet B.
 
-function [F,T,D,t] = polyhedronForce(verticesA,verticesB,magA,magB,torquepoint,tolerance,timeout,varargin)
+function [F,T,C,t] = polyhedronForce(verticesA,verticesB,magA,magB,torquepoint,tolerance,timeout,varargin)
 
 % If missing arguments:
 if nargin < 7
@@ -47,16 +47,16 @@ t = [];
 i = 1;
 ctr = 0;
 oldC = 0;
-D = Inf;
+C = Inf;
 
 % figure;
 
-while max(abs(D(end,:)-oldC)) > tolerance && toc < timeout
-    max(abs(D(end,:)-oldC))
+while max(abs(C(end,:)-[F(end,:),T(end,:)])) > tolerance && toc < timeout
+    max(abs(C(end,:)-[F(end,:),T(end,:)]))
     % Temp values to compare error for convergence
     Fold = F(end,:);
     Told = T(end,:);
-    oldC = D(end,:);
+    oldC = C(end,:);
     
     % Set up and subdivide mesh
     Fac = minConvexHull(verticesB);
@@ -85,10 +85,12 @@ while max(abs(D(end,:)-oldC)) > tolerance && toc < timeout
     ctr = ctr + 1;
     
     if ctr >= 2
-        D(end+1,:) = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
+        C(end+1,:) = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
     else
-        D(end+1,1:6) = zeros(1,6);
+        C(end+1,1:6) = zeros(1,6);
     end
+    
+    
     
     t(end+1,1) = toc;
     
@@ -143,5 +145,7 @@ T = T(2:end,:);
 ctr
 
 toc
+
+max(abs(C(end,:)-[F(end,:),T(end,:)]))
 
 end
