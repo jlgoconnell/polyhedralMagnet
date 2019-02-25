@@ -44,15 +44,15 @@ Told = Fold;
 t = [];
 
 % Choose a suitable starting mesh parameter
-i = 1;
+i = 10;
 ctr = 0;
 oldC = 0;
-C = Inf;
+C = [0,0,0,0,0,0;Inf,Inf,Inf,Inf,Inf,Inf];
 
 % figure;
 
-while max(abs(C(end,:)-[F(end,:),T(end,:)])) > tolerance && toc < timeout
-    max(abs(C(end,:)-[F(end,:),T(end,:)]))
+while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
+%     max(abs(C(end,:)-[F(end,:),T(end,:)]))
     % Temp values to compare error for convergence
     Fold = F(end,:);
     Told = T(end,:);
@@ -132,10 +132,17 @@ while max(abs(C(end,:)-[F(end,:),T(end,:)])) > tolerance && toc < timeout
 %         grid on;
 %         ylabel('Tz');
 %     end
+max(abs(C(end,:)-C(end-1,:)))
     
 end
 
-max(abs([F(end,:),T(end,:)]-[Fold,Told]))
+C = C(3:end,:);
+
+figure;
+drawMesh(Ver,Fac)
+
+% max(abs([F(end,:),T(end,:)]-[Fold,Told]))
+
 
 % F = D(1:3);
 % T = D(4:6);
@@ -146,6 +153,6 @@ ctr
 
 toc
 
-max(abs(C(end,:)-[F(end,:),T(end,:)]))
+% max(abs(C(end,:)-[F(end,:),T(end,:)]))
 
 end
