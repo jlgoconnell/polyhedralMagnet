@@ -44,7 +44,7 @@ Told = Fold;
 t = [];
 
 % Choose a suitable starting mesh parameter
-i = 10;
+i = 1;
 ctr = 0;
 oldC = 0;
 C = [0,0,0,0,0,0;Inf,Inf,Inf,Inf,Inf,Inf];
@@ -132,24 +132,24 @@ while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
 %         grid on;
 %         ylabel('Tz');
 %     end
-max(abs(C(end,:)-C(end-1,:)))
+% max(abs(C(end,:)-C(end-1,:)))
     
 end
 
 C = C(3:end,:);
-
+% 
 figure;
-drawMesh(Ver,Fac)
+drawMesh(Ver,Fac,'white')
 
 % max(abs([F(end,:),T(end,:)]-[Fold,Told]))
 
 
-% F = D(1:3);
-% T = D(4:6);
+% F = C(end,1:3);
+% T = C(end,4:6);
 
-F = F(2:end,:);
-T = T(2:end,:);
-ctr
+% F = F(2:end,:);
+% T = T(2:end,:);
+% ctr
 
 toc
 
