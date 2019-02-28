@@ -143,12 +143,16 @@ drawMesh(Ver,Fac,'white')
 
 % max(abs([F(end,:),T(end,:)]-[Fold,Told]))
 
+% F = F(2:end,:);
+% T = T(2:end,:);
 
 % F = C(end,1:3);
 % T = C(end,4:6);
 
 % F = F(2:end,:);
 % T = T(2:end,:);
+% ctr
+
 % ctr
 
 toc
