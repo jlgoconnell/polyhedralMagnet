@@ -54,9 +54,9 @@ C = [0,0,0,0,0,0;Inf,Inf,Inf,Inf,Inf,Inf];
 while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
 %     max(abs(C(end,:)-[F(end,:),T(end,:)]))
     % Temp values to compare error for convergence
-    Fold = F(end,:);
-    Told = T(end,:);
-    oldC = C(end,:);
+%     Fold = F(end,:);
+%     Told = T(end,:);
+%     oldC = C(end,:);
     
     % Set up and subdivide mesh
     Fac = minConvexHull(verticesB);
