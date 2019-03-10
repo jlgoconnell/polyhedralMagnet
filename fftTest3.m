@@ -1,65 +1,76 @@
 
 % Learning how to use FFT
 %
-% James O'Connell 10th March 2019
+% James O'Connell 11th March 2019
 
 clear;
 close all;
 clc;
 
-n = 64;
-x = linspace(0,1,n);
-y = linspace(0,1,n);
+% Define the first magnet
+phi = (1+sqrt(5))/2;
+A = 0.01*phi;
+verticesA = [1,1,1;1,1,-1;1,-1,1;1,-1,-1;-1,1,1;-1,1,-1;-1,-1,1;-1,-1,-1;...
+    0,phi,1/phi;0,phi,-1/phi;0,-phi,1/phi;0,-phi,-1/phi;...
+    1/phi,0,phi;1/phi,0,-phi;-1/phi,0,phi;-1/phi,0,-phi;...
+    phi,1/phi,0;phi,-1/phi,0;-phi,1/phi,0;-phi,-1/phi,0];
+thetax = 31.715*pi/180;
+R_x = [1,0,0;0,cos(thetax),-sin(thetax);0,sin(thetax),cos(thetax)];
+verticesA = verticesA*R_x;
+Sa = alphaShape(verticesA,Inf);
+magA = [0,0,1];
+
+n = 256;
+x = linspace(-0.1,0.1,n);
+y = linspace(-0.1,0.1,n);
 [X,Y] = meshgrid(x,y);
-f = cos(2*pi*1*X)+2*cos(2*pi*2*Y+2*pi*3*X);
+B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(1.38,size(X(:)))]);
+Bz = reshape(B(:,3),size(X));
+f = Bz;
+% f = cos(2*pi*1*X)+2*cos(2*pi*2*Y+2*pi*3*X)+3*cos(2*pi*3*Y);
 
 figure;
-plot3(X(:),Y(:),f(:),'ro');
+plot3(X(:),Y(:),f(:),'r.');
 hold on;
 
 ff = fft2(f);
-ff = ff/n^2;
 
 freqsx = 1/(x(2)-x(1))*(0:(n-1))/n;
 freqsy = 1/(y(2)-y(1))*(0:(n-1))/n;
 
-data = zeros(length(x),length(y));
+ff = ff/n^2;
 
-n2 = n;
-x2 = linspace(0,1,n2);
-y2 = linspace(0,1,n2);
+ff = 2*ff(1:n/2+1,1:n/2+1);
+% ff(2:end-1,2:end-1) = 2*ff(2:end-1,2:end-1);
+freqsx = freqsx(1:n/2+1);
+freqsy = freqsy(1:n/2+1);
+
+n2 = n*1;
+x2 = linspace(x(1),x(end),n2);
+y2 = linspace(y(1),y(end),n2);
 [X2,Y2] = meshgrid(x2,y2);
 % f = cos(2*pi*1*X)+2*cos(2*pi*2*Y+2*pi*3*X);
+data = zeros(length(x2),length(y2));
 
-a = 1
-
-[Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
-Freqsx = reshape(Freqsx,[1,1,size(Freqsx)]);
-Freqsy = reshape(Freqsy,[1,1,size(Freqsy)]);
-% X = repmat(X,[1,1,size(Freqsx)]);
-% Y = repmat(Y,[1,1,size(Freqsy)]);
-
-
-data = sum(sum(ff.*(exp(2*pi*1i*Freqsx.*X).*exp(2*pi*1i*Freqsy.*Y)),3),4);
+for j = 1:length(x2)
+    for k = 1:length(y2)
+        
+        [Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
+        
+        xx = x2(j);
+        yy = y2(k);
+        
+        data(k,j) = sum(sum((ff).*exp(2*pi*1i*Freqsx*xx+2*pi*1i*Freqsy*yy)));
+        
+    end
+end
 data = real(data);
-% 
-% 
-% for j = 1:length(x)
-%     for k = 1:length(y)
-%         
-%         [Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
-%         
-%         xx = x(j);
-%         yy = y(k);
-%         
-%         data(k,j) = sum(sum((ff).*exp(2*pi*1i*Freqsx*xx).*exp(2*pi*1i*Freqsy*yy)));
-%         
-%     end
-% end
-% data = real(data);
-% 
-surf(X,Y,data);
+
+% f2 = cos(2*pi*1*X2)+2*cos(2*pi*2*Y2+2*pi*3*X2)+3*cos(2*pi*3*Y2);
+surf(X2,Y2,data);
+% plot3(X2(:),Y2(:),f2(:),'ro');
+grid on;
 
 % error = f-data;
 % figure;
-% surf(X,Y,error);
+% surf(X2,Y2,error);
