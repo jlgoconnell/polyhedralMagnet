@@ -8,7 +8,7 @@ close all;
 clc;
 
 n = 1024;
-x = linspace(0,1,n);
+x = linspace(0,0.01,n);
 
 f = cos(2*pi*10*x)+2*sin(2*pi*22*x);
 
@@ -24,7 +24,7 @@ a = (n-1)/(max(x)-min(x));
 
 k = 1:n;
 
-freqs = a*x.*(k-1)/n;
+% freqs = a*x.*(k-1)/n;
 freqs = 1/(x(2)-x(1))*(0:(n-1))/n;
 
 freqs = freqs(1:length(ff));
