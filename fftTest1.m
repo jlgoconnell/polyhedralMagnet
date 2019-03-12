@@ -7,7 +7,7 @@ clear;
 close all;
 clc;
 
-n = 1024;
+n = 16;
 x = linspace(0,0.01,n);
 
 f = cos(2*pi*10*x)+2*sin(2*pi*22*x);
@@ -23,6 +23,8 @@ phase = angle(ff);
 a = (n-1)/(max(x)-min(x));
 
 k = 1:n;
+
+% ff = fftshift(ff);
 
 % freqs = a*x.*(k-1)/n;
 freqs = 1/(x(2)-x(1))*(0:(n-1))/n;
@@ -53,6 +55,7 @@ for j = 1:length(x)
     data(j) = sum((ff).*exp(2*pi*1i*freqs*xx));
     
 end
+data = real(data);
 
 
 
@@ -61,4 +64,4 @@ plot(x,f,'.--');
 hold on
 plot(x,data,'-');
 % plot(x,estf,'--');
-legend('Real','FFT','IFFT');
+legend('Real','FFT');

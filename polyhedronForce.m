@@ -141,6 +141,8 @@ C = C(3:end,:);
 figure;
 drawMesh(Ver,Fac,'white')
 
+size(n)
+
 % max(abs([F(end,:),T(end,:)]-[Fold,Told]))
 
 % F = F(2:end,:);

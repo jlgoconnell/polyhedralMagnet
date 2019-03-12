@@ -30,12 +30,14 @@ Fac = minConvexHull(verticesB);
 [Ver,~] = surfToMesh(verticesB(:,1),verticesB(:,2),verticesB(:,3));
 norms = meshFaceNormals(Ver,Fac);
 
-fac = triangulateFaces(Fac);
-[ver,fac] = subdivideMesh(Ver,fac,subdivideNumber);
-[verr,facc] = subdivideMesh(ver,fac,2);
-B = polyhedronField(verticesA,magA,verr);
+% figure;
+% hold on;
 
 for i = 1%:length(Fac)
+
+    fac = triangulateFaces(Fac{i});
+    [ver,fac] = subdivideMesh(Ver,fac,subdivideNumber);
+    [verr,facc] = subdivideMesh(ver,fac,2);
     
     n = norms(i,:);
     thetay = atan2(n(1),-n(3));
@@ -52,7 +54,14 @@ for i = 1%:length(Fac)
     end
     faces = faceinfo';
     faces = faces(:);
-    myver = verr(faces,:)*R;
+    myver = verr(faces,:);
+    B = polyhedronField(verticesA,magA,myver);
+    verrot = myver*R;
+    Brot = B*R;
+    
+    x = [verrot(faces,1).^2,verrot(faces,1),verrot(faces,2).^2,verrot(faces,2),verrot(faces,1).*verrot(faces,2),ones(length(faces),1)];
+    bz = B(:,3);
+    
     
 end
 

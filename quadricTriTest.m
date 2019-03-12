@@ -27,14 +27,14 @@ magB = [0,0,-1.3];
 Sb = alphaShape(verticesB,Inf);
 
 % Calculate the actual forces using current force method
-[Factual,Tactual] = polyhedronForce(verticesA,verticesB,magA,magB,mean(verticesB),1e-30,1);
+[Factual,Tactual] = polyhedronForce(verticesA,verticesB,magA,magB,mean(verticesB),1e-30,2.3);
 Factual
 
 % Now let's estimate the force on magnet B
 Fac = minConvexHull(verticesB);
 [Ver,~] = surfToMesh(verticesB(:,1),verticesB(:,2),verticesB(:,3));
 [Fac,~] = triangulateFaces(Fac);
-[Ver,Fac] = subdivideMesh(Ver,Fac,2);
+[Ver,Fac] = subdivideMesh(Ver,Fac,4);
 norms = meshFaceNormals(Ver,Fac);
 Areas = meshFaceAreas(Ver,Fac);
 
