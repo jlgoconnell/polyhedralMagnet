@@ -20,7 +20,7 @@ verticesA = verticesA*R_x;
 Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 
-n = 256;
+n = 64;
 x = linspace(-0.03,0.03,n);
 y = linspace(-0.03,0.03,n);
 [X,Y] = meshgrid(x,y);
@@ -39,17 +39,21 @@ ff = fft2(f);
 freqsx = 1/(x(2)-x(1))*(0:(n-1))/n;
 freqsy = 1/(y(2)-y(1))*(0:(n-1))/n;
 
+freqsx(length(freqsx)/2:end) = freqsx(length(freqsx)/2:end)'-1/(x(2)-x(1));
+freqsy(length(freqsy)/2:end) = freqsy(length(freqsy)/2:end)'-1/(x(2)-x(1));
+
+
 % freqsx = (0:n-1);
 % freqsy = freqsx;
 
 % ff = ff/n^2;
 
-% ff = 2*ff(1:n/2+1,1:n/2+1);
-% % ff(2:end-1,2:end-1) = 2*ff(2:end-1,2:end-1);
+% ff = ff(1:n/2+1,1:n/2+1);
+% ff(2:end-1,2:end-1) = 2*ff(2:end-1,2:end-1);
 % freqsx = freqsx(1:n/2+1);
 % freqsy = freqsy(1:n/2+1);
 
-n2 = n*1;
+n2 = n*4;
 x2 = linspace(x(1),x(end),n2);
 y2 = linspace(y(1),y(end),n2);
 [X2,Y2] = meshgrid(x2,y2);
@@ -57,6 +61,7 @@ y2 = linspace(y(1),y(end),n2);
 data = zeros(length(x2),length(y2));
 
 for j = 1:length(x2)
+    j
     for k = 1:length(y2)
         
         [Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
