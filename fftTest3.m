@@ -21,13 +21,14 @@ Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 
 n = 64;
-x = linspace(-0.03,0.03,n);
-y = linspace(-0.03,0.03,n);
+x = linspace(-0.04,0.04,n);
+y = linspace(-0.04,0.04,n);
 [X,Y] = meshgrid(x,y);
 B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(0.023,size(X(:)))]);
 Bz = reshape(B(:,3),size(X));
 f = Bz;
-% f = cos(2*pi*1*X)+2*cos(2*pi*2*Y+2*pi*3*X)+3*cos(2*pi*3*Y);
+
+dx = x(2)-x(1);
 
 figure;
 plot3(X(:),Y(:),f(:),'r.');
@@ -53,23 +54,29 @@ freqsy(length(freqsy)/2:end) = freqsy(length(freqsy)/2:end)'-1/(x(2)-x(1));
 % freqsx = freqsx(1:n/2+1);
 % freqsy = freqsy(1:n/2+1);
 
-n2 = n*4;
+n2 = 4*(n-1)+1;
 x2 = linspace(x(1),x(end),n2);
 y2 = linspace(y(1),y(end),n2);
+dx2 = x2(2)-x2(1);
 [X2,Y2] = meshgrid(x2,y2);
 % f = cos(2*pi*1*X)+2*cos(2*pi*2*Y+2*pi*3*X);
 data = zeros(length(x2),length(y2));
+intt = data;
+        
+[Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
+
+A = 2*pi*1i*Freqsx;
+B = 2*pi*1i*Freqsy;
 
 for j = 1:length(x2)
     j
     for k = 1:length(y2)
         
-        [Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
-        
         xx = x2(j);
         yy = y2(k);
         
         data(k,j) = 1/n^2*sum(sum((ff).*exp(2*pi*1i*Freqsx*(xx-x(1))+2*pi*1i*Freqsy*(yy-y(1)))));
+        intt(k,j) = dx2^2*data(k,j);
         
     end
 end
@@ -86,3 +93,22 @@ grid on;
 % error = f-data;
 % figure;
 % surf(X2,Y2,error);
+
+% Try to calculate volume under surface
+I = zeros(size(ff));
+% A = 0, B = 0:
+I(1,1) = (x(end)-x(1))*(y(end)-y(1))*ff(1,1);
+% A = 0, B ~= 0:
+I(2:end,1) = ff(2:end,1)*(x(end)-x(1)).*(f(end,1)-f(1,1))./B(2:end,1);
+I(2:end,1) = ff(2:end,1)*(x(end)-x(1)).*(exp(B(2:end,1)*y(end))-exp(B(2:end,1)*y(1)))./B(2:end,1);
+% A ~= 0, B = 0:
+I(1,2:end) = ff(1,2:end)*(y(end)-y(1)).*(f(1,end)-f(1,1))./A(1,2:end);
+I(1,2:end) = ff(1,2:end)*(y(end)-y(1)).*(exp(A(1,2:end)*x(end))-exp(A(1,2:end)*x(1)))./A(1,2:end);
+% A ~= 0, B ~= 0:
+I(2:end,2:end) = ff(2:end,2:end)./(A(2:end,2:end).*B(2:end,2:end))*(f(end,end)-f(1,end)-f(end,1)+f(1,1));
+areaint = sum(abs(I(:)))/n^2
+actualint = trapz(y,trapz(x,f,2),1)
+dataint = trapz(y2,trapz(x2,data,2),1)
+
+
+
