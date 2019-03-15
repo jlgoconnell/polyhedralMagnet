@@ -8,8 +8,13 @@ clear;
 clc;
 
 n = 64;
+<<<<<<< Updated upstream
 x = linspace(0,2,n)-2;
 y = linspace(0,2,n)-2;
+=======
+x = linspace(0,1,n);
+y = linspace(0,1,n);
+>>>>>>> Stashed changes
 [X,Y] = meshgrid(x,y);
 f = cos(2*pi*1*X)+2*cos(2*pi*2*Y+2*pi*3*X)+3*cos(2*pi*3*Y);
 
@@ -71,9 +76,10 @@ data = real(data);
 
 f2 = cos(2*pi*1*X2)+2*cos(2*pi*2*Y2+2*pi*3*X2)+3*cos(2*pi*3*Y2);
 surf(X2,Y2,data);
-plot3(X2(:),Y2(:),f2(:),'ro');
+plot3(X2(:),Y2(:),f2(:),'r.');
 grid on;
 
-% error = f-data;
-% figure;
-% surf(X2,Y2,error);
+% f = cos(2*pi*1*X2)+2*cos(2*pi*2*Y2+2*pi*3*X2)+3*cos(2*pi*3*Y2);
+error = f2-data;
+figure;
+surf(X2,Y2,error);

@@ -20,11 +20,19 @@ verticesA = verticesA*R_x;
 Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 
+<<<<<<< Updated upstream
 n = 64;
 x = linspace(-0.04,0.04,n);
 y = linspace(-0.04,0.04,n);
 [X,Y] = meshgrid(x,y);
 B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(0.02235,size(X(:)))]);
+=======
+n = 128;
+x = linspace(-0.1,0.1,n);
+y = linspace(-0.1,0.1,n);
+[X,Y] = meshgrid(x,y);
+B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(0.025,size(X(:)))]);
+>>>>>>> Stashed changes
 Bz = reshape(B(:,3),size(X));
 f = Bz;
 
