@@ -3,7 +3,7 @@
 %
 % James O'Connell 18th March 2019
 
-clear;
+% clear;
 close all;
 clc;
 
@@ -20,8 +20,6 @@ verticesA = verticesA*R_x;
 Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 
-z = 0.02235;
-
 % Define geometry area
 x1 = 0.01;
 x2 = 0.02;
@@ -31,13 +29,21 @@ y21 = 0.02;
 y22 = 0.01;
 ys = [y11,y12,y21,y22];
 ymin = min(ys);
+% x1 = -0.04;
+% x2 = 0.04;
+% y11 = -0.04;
+% y12 = -0.04;
+% y21 = 0.04;
+% y22 = 0.04;
+% ys = [y11,y12,y21,y22];
+% ymin = min(ys);
 
 % Calculate field at all points
 n = 64;
 x = linspace(x1,x2,n);
 y = linspace(min(ys),max(ys),n);
 [X,Y] = meshgrid(x,y);
-B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(z,size(X(:)))]);
+B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(0.025,size(X(:)))]);
 Bz = reshape(B(:,3),size(X));
 f = Bz;
 
@@ -51,6 +57,8 @@ freqsx = fftshift(freqsx);
 freqsy = fftshift(freqsy);
 freqsx = freqsx - freqsx(1);
 freqsy = freqsy - freqsy(1);
+% freqsx(length(freqsx)/2:end) = freqsx(length(freqsx)/2:end)'-1/(x(2)-x(1));
+% freqsy(length(freqsy)/2:end) = freqsy(length(freqsy)/2:end)'-1/(x(2)-x(1));
 
 [Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
 A = 2*pi*1i*Freqsx;
@@ -89,20 +97,20 @@ F(2:end,2:end) = ff(2:end,2:end)./(B(2:end,2:end).* ...
     (exp(A(2:end,2:end)*x2+B(2:end,2:end)*y12)-exp(A(2:end,2:end)*x1+...
     B(2:end,2:end)*y11))./(A(2:end,2:end)+B(2:end,2:end)*m1));
 F(isnan(F)) = 0;
-inttotal = sum(F(:))/n^2;
+inttotal = sum(F(:))/n^2
 
 % Estimate actual integral
 midptsx = 0.25*(x(1:end-1,1:end-1)+x(1:end-1,2:end)+x(2:end,1:end-1)+x(2:end,2:end));
 midptsy = 0.25*(y(1:end-1,1:end-1)+y(1:end-1,2:end)+y(2:end,1:end-1)+y(2:end,2:end));
-BB = polyhedronField(verticesA,magA,[midptsx(:),midptsy(:),repmat(z,size(midptsx(:)))]);
+BB = polyhedronField(verticesA,magA,[midptsx(:),midptsy(:),repmat(0.025,size(midptsx(:)))]);
 Bz = reshape(BB(:,3),size(midptsx));
 dx = x(1:end-1,2:end)-x(1:end-1,1:end-1);
 dy = y(2:end,:)-y(1:end-1,:);
 area = 0.5*(dy(:,2:end)+dy(:,1:end-1)).*dx;
 
-actual = sum(sum(Bz.*area))
-estimate = real(inttotal)
-pcerror = (estimate-actual)/actual*100
+actual = sum(sum(Bz.*area));
+estimate = real(inttotal);
+pcerror = (estimate-actual)/
 
 
 
