@@ -3,7 +3,7 @@
 %
 % James O'Connell 11th March 2019
 
-clear;
+% clear;
 close all;
 clc;
 
@@ -20,11 +20,13 @@ verticesA = verticesA*R_x;
 Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 
-n = 64;
+tic;
+
+n = 32;
 x = linspace(-0.04,0.04,n);
 y = linspace(-0.04,0.04,n);
 [X,Y] = meshgrid(x,y);
-B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(0.02235,size(X(:)))]);
+B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(0.025,size(X(:)))]);
 Bz = reshape(B(:,3),size(X));
 f = Bz;
 
@@ -43,6 +45,10 @@ freqsy = 1/(y(2)-y(1))*(0:(n-1))/n;
 freqsx(length(freqsx)/2:end) = freqsx(length(freqsx)/2:end)'-1/(x(2)-x(1));
 freqsy(length(freqsy)/2:end) = freqsy(length(freqsy)/2:end)'-1/(x(2)-x(1));
 
+% freqsx = fftshift(freqsx);
+% freqsy = fftshift(freqsy);
+% freqsx = freqsx - freqsx(1);
+% freqsy = freqsy - freqsy(1);
 
 % freqsx = (0:n-1);
 % freqsy = freqsx;
@@ -54,7 +60,7 @@ freqsy(length(freqsy)/2:end) = freqsy(length(freqsy)/2:end)'-1/(x(2)-x(1));
 % freqsx = freqsx(1:n/2+1);
 % freqsy = freqsy(1:n/2+1);
 
-n2 = 4*(n-1)+1;
+n2 = 6*(n-1)+1;
 x2 = linspace(x(1),x(end),n2);
 y2 = linspace(y(1),y(end),n2);
 dx2 = x2(2)-x2(1);
@@ -81,8 +87,8 @@ B = 2*pi*1i*Freqsy;
 %     end
 % end
 % data = real(data);
-
-mydata = ifft2(ff);
+% 
+% mydata = ifft2(ff);
 
 % f2 = cos(2*pi*1*X2)+2*cos(2*pi*2*Y2+2*pi*3*X2)+3*cos(2*pi*3*Y2);
 % surf(X2,Y2,data);
@@ -112,5 +118,5 @@ areaint = abs(sum(I(:)))/n^2
 actualint = trapz(y,trapz(x,f,2),1)
 % dataint = trapz(y2,trapz(x2,data,2),1)
 
-
+toc;
 
