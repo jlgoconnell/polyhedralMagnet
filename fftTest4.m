@@ -3,7 +3,7 @@
 %
 % James O'Connell 18th March 2019
 
-clear;
+% clear;
 close all;
 clc;
 
