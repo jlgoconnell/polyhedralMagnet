@@ -7,14 +7,15 @@
 
 function trapVertices = trapDecomp(vertices)
 
-vertices = unique(sortrows(vertices),'rows');
+close all;
+
 trapVertices = vertices;
 
 conlist = convhull(vertices);
 xv = vertices(conlist,1);
 yv = vertices(conlist,2);
 
-for j = 1:length(xv)-1
+for j = 1:length(xv)
     tempvec = (xv(1:end-1)-xv(j)).*(xv(2:end)-xv(j));
     inds = tempvec<0;
     
@@ -24,12 +25,20 @@ for j = 1:length(xv)-1
         c = intersecverts(1,2)-m*intersecverts(1,1);
         ypt = m*xv(j)+c;
         trapVertices = [trapVertices; xv(j), ypt];
-    else if sum(tempvec==0) == 2
-            trapVertices = [trapVertices; xv(j),yv(j)];
-        end
     end
 end
 
 trapVertices = sortrows(trapVertices);
+
+figure;
+subplot(1,2,1);
+s = alphaShape(vertices,inf);
+cc = convhull(s.Points);
+fill(s.Points(cc,1),s.Points(cc,2),'m');
+subplot(1,2,2);
+hold on;
+for j = 1:2:length(trapVertices)
+    fill(trapVertices(
+end
 
 end
