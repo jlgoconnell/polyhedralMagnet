@@ -43,26 +43,8 @@ for i = 1:length(Fac)
     thisz = facepts(1,3);
     
     % Decompose into trapezia
-    facepts(end+1,:) = facepts(1,:);
-    trappts = facepts;
-    for j = 1:length(facepts)-1
-        for k = 1:length(facepts)
-            if (facepts(k,1)-facepts(j,1))*(facepts(k,1)-facepts(j+1,1)) < -1*eps
-                m = (facepts(j+1,2)-facepts(j,2))/(facepts(j+1,1)-facepts(j,1));
-                c = facepts(j,2)-m*facepts(j,1);
-                trappts = [trappts;facepts(k,1),m*facepts(k,1)+c,thisz];
-            end
-        end
-    end
-    trappts = sortrows(trappts);
-    trappts = uniquetol(trappts,'ByRows',true);
-    traplength = length(trappts);
-    for j = 1:traplength
-        if sum(abs(trappts(j,1)-trappts(:,1))<eps) == 1
-            trappts = [trappts;trappts(j,:)];
-        end
-    end
-    trappts = sortrows(trappts);
+    trappts = trapDecomp(facepts(:,1:2));
+    trappts = [trappts, facepts(1,3)*ones(length(trappts),1)];
     
     % Now calculate field of each trapezium
     Bxpoly = zeros(size(obspt,1),1);
