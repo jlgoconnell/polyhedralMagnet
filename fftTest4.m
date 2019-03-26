@@ -20,7 +20,7 @@ verticesA = verticesA*R_x;
 Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 
-z = 0.02235;
+z = 0.025;
 
 % Define geometry area
 x1 = 0.01;
@@ -29,19 +29,22 @@ y11 = -0.02;
 y12 = -0.015;
 y21 = 0.02;
 y22 = 0.01;
-y22 = y21;
+% y22 = y21;
 % y12 = y11;
 ys = [y11,y12,y21,y22];
 ymin = min(ys);
 
 % Calculate field at all points
-n = 64;
+n = 256;
 x = linspace(x1,x2,n);
 y = linspace(min(ys),max(ys),n);
 [X,Y] = meshgrid(x,y);
 B = polyhedronField(verticesA,magA,[X(:),Y(:),repmat(z,size(X(:)))]);
 Bz = reshape(B(:,3),size(X));
 f = Bz;
+% 
+% figure;
+% surf(X,Y,Bz);
 
 % Calculate FFT
 ff = fft2(f);
@@ -159,10 +162,10 @@ midptsy = 0.25*(y(1:end-1,1:end-1)+y(1:end-1,2:end)+y(2:end,1:end-1)+y(2:end,2:e
 %     j
 %     for k = 1:length(midptsy)
 %         
-%         xx = midptsx(j);
-%         yy = midptsy(k);
+%         xx = midptsx(k,j);
+%         yy = midptsy(k,j);
 %         
-%         data(k,j) = 1/n^2*sum(sum((ff).*exp(2*pi*1i*Freqsx*(xx-midptsx(1))+2*pi*1i*Freqsy*(yy-midptsy(1)))));
+%         data(k,j) = 1/n^2*sum(sum((ff).*exp(2*pi*1i*Freqsx*(xx-x1)+2*pi*1i*Freqsy*(yy-ymin))));
 % %         intt(k,j) = dx2^2*data(k,j);
 %         
 %     end
@@ -177,6 +180,15 @@ area = 0.5*(dy(:,2:end)+dy(:,1:end-1)).*dx;
 actual = sum(sum(Bz.*area))
 estimate = real(inttotal)
 pcerror = (estimate-actual)/actual*100
+% 
+% figure;
+% surf(midptsx,midptsy,Bz);
+% 
+% figure;
+% surf(midptsx,midptsy,data);
+% 
+% figure;
+% surf(midptsx,midptsy,data-Bz);
 
 
 
