@@ -1,23 +1,5 @@
 
-% Function to estimate the force and torque between two polyhedral
-% permanent magnets, both with constant uniform magnetisation. Let one
-% magnet be magnet A and the other be magnet B. This function calculates
-% the force and torque on magnet B.
-%
-% Inputs:
-% verticesA: The vertices of one magnet in an (n x 3) matrix.
-% verticesB: The vertices of the magnet we are calculating the force and
-% torque on in an (n x 3) matrix.
-% magA: The magnetisation vector of magnet A in Teslas.
-% magB: The magnetisation vector of magnet B in Teslas.
-% nFFT: The exponent of 2 which will be used as the number of gridpoints
-% for the FFT. Larger integers will produce more accurate results but take
-% longer to compute. Recommended range: 3 to 7.
-%
-% Outputs:
-% F: A vector representing the x, y, and z forces on magnet B.
-%
-% James O'Connell 1st April 2019
+% Function to estimate 
 
 function F = polyhedronForceFFT(verticesA,verticesB,magA,magB,nFFT)
 

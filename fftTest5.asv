@@ -29,8 +29,8 @@ y11 = -0.02;
 y12 = -0.015;
 y21 = 0.02;
 y22 = 0.01;
-y22 = y21;
-y12 = y11;
+% y22 = y21;
+% y12 = y11;
 ys = [y11,y12,y21,y22];
 ymin = min(ys);
 ymax = max(ys);
@@ -64,7 +64,6 @@ freqsx = fftshift(freqsx);
 freqsy = fftshift(freqsy);
 freqsx = freqsx - freqsx(1);
 freqsy = freqsy - freqsy(1);
-
 [Freqsx,Freqsy] = meshgrid(freqsx,freqsy);
 A = 2*pi*1i*Freqsx;
 B = 2*pi*1i*Freqsy;
@@ -102,13 +101,13 @@ Fr(IJ1) = ff(IJ1)./(B(IJ1).* ...
     exp(A(IJ1)*xstart+B(IJ1)*ystart)).*(x2-x1).*exp(B(IJ1)*c1);
 % A = 0, B ~= 0:
 if m1 == 0
-    Fr(2:end,1) = -ff(2:end,1)./B(2:end,1).*(x2-x1).*exp(B(2:end,1)*(c1-ystart));
+    Fr(2:end,1) = -ff(2:end,1)./B(2:end,1).*(x2-x1).*exp(B(2:end,1)*c1);
 else
-    Fr(2:end,1) = -ff(2:end,1)./(B(2:end,1).^2.*exp(B(2:end,1)*ystart)).* ...
-        ((exp(B(2:end,1)*y12)-exp(B(2:end,1)*y11))/m1);
+    Fr(2:end,1) = -ff(2:end,1)./(B(2:end,1)  ((exp(B(2:end,1)*y12)-exp(B(2:end,1)*y11))/m1);
 end
 if m2 == 0
-    Fl(2:end,1) = ff(2:end,1)./B(2:end,1).*(x2-x1).*exp(B(2:end,1)*(c2-ystart));
+    Fl(2:end,1) = ff(2:end,1)./(B(2:end,1).^2.*exp(B(2:end,1)*ystart)).* ... % I THINK THIS IS BROKEN
+        (x2-x1).*exp(B(2:end,1)*c2);
 else
     Fl(2:end,1) = ff(2:end,1)./(B(2:end,1).^2.*exp(B(2:end,1)*ystart)).* ...
         ((exp(B(2:end,1)*y22)-exp(B(2:end,1)*y21))/m2);
