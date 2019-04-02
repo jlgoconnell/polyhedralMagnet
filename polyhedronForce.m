@@ -75,6 +75,7 @@ while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
     obspt = meshFaceCentroids(Ver,Fac);
     MdotN = MdotN(abs(MdotN)>1e-8,:);
     B = polyhedronField(verticesA,magA,obspt);
+    size(obspt)
     
     % Calculate force and torque
     F(end+1,:) = sum(B.*MdotN.*dA,1);

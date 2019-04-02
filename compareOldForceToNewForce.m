@@ -3,7 +3,7 @@
 % 
 % James O'Connell 1st April 2019
 
-clear;
+% clear;
 close all;
 clc;
 
@@ -25,7 +25,21 @@ magB = [0,0,-1];
 torquept = mean(verticesB);
 
 tic;
-Ffft = polyhedronForceFFT(verticesA,verticesB,magA,magB,6)
-timeout = toc;
+Ffft = polyhedronForceFFT(verticesA,verticesB,magA,magB,4)
+% t = 23.66
+toc;
 
-[Fold,~,~,~] = polyhedronForce(verticesA,verticesB,magA,magB,torquept,1e-5,timeout)
+tic;
+[Fold,~,~,~] = polyhedronForce(verticesA,verticesB,magA,magB,torquept,1e-5,0.3)
+toc;
+
+Freal = [28.5137;42.7820;311.2703];
+
+mean(abs(Freal-Ffft))
+mean(abs(Freal-Fold(end,:)'))
+% 
+% for i = 3:8
+%     tic;
+%     Ffft(:,i) = polyhedronForceFFT(verticesA,verticesB,magA,magB,i);
+%     t(i) = toc;
+% end
