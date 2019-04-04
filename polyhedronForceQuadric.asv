@@ -27,22 +27,9 @@ for i = 1:length(FacB)
     Rx = [1,0,0;0,cos(thetax),-sin(thetax);0,sin(thetax),cos(thetax)];
     Rn = Rx*Ry;
     R = Rn^-1;
-    
-    
     faceverts = faceverts*R;
     z = faceverts(1,3);
     vertTrap = trapDecomp(faceverts(:,1:2));
-    verticesAtemp = verticesA*R;
-    magAtemp = magA*R;
-    
-%     
-%     figure;
-%     Sa = alphaShape(verticesAtemp,Inf);
-%     plot(Sa);
-%     hold on;
-%     fill3(faceverts(:,1),faceverts(:,2),faceverts(:,3),'red');
-%     xlabel('x');
-%     ylabel('y');
     
     % Take each trapezium and calculate the force on it:
     for j = 1:2:length(vertTrap)-3
@@ -69,9 +56,9 @@ for i = 1:length(FacB)
         end
         fieldpts = [v3(f4,:),z*ones(numel(f4),1)];
         % Calculate the field at each point:
+        verticesAtemp = verticesA*R;
+        magAtemp = magA*R;
         Bfield = polyhedronField(verticesAtemp,magAtemp,fieldpts,FacA);
-        
-%         quiver3(fieldpts(:,1),fieldpts(:,2),fieldpts(:,3),Bfield(:,1),Bfield(:,2),Bfield(:,3))
         
         % Set up sparse matrix:
         A = sparse(6*size(f2,1),6*size(f2,1));
@@ -111,7 +98,7 @@ for i = 1:length(FacB)
         x = sort([xtop;xsingle]);
         x = repelem(x',2,1);
         x = repmat(x,1,size(coeffs,2));
-        I = -[1,-1;-1,1];
+        I = [1,-1;-1,1];
         I = repmat(I,size(f2,1),size(coeffs,2));
         
         
@@ -137,21 +124,20 @@ for i = 1:length(FacB)
         
         % Estimate force from trapezial plate:
 %         ftrap = I.*(x.^4/4.*(A.*m+c.*m.^3/3)+x.^3/3.*(A.*c+B.*m+C.*m.^2.*c+D.*m.^2/2+E.*m.^2/2)+x.^2/2.*(B.*c+C.*m.*c+D.*m.*c+E.*m.*c+F.*m)+x.*(C.*c.^3/3+D.*c.^2/2+E.*c.^2/2+F.*c));
-        ftrap = I.*(x.^4/4.*(A.*m+C.*m.^3/3+E/2.*m.^2)+...
-            x.^3/3.*(C.*m.^2.*c+D/2.*m.^2+E.*m.*c+A.*c+B.*m)+...
-            x.^2/2.*(C.*m.*c.^2+D.*m.*c+E/2.*c.^2+B.*c+F.*m)+...
+        ftrap = I.*(x.^4/4.*(A.*m+C.*m.^3/3+E.*m.^2)+...
+            x.^3/3.*(C.*m.^2.*c+D/2.*m.^2+2*E.*m.*c+A.*c+B.*m)+...
+            x.^2/2.*(C.*m.*c.^2+D.*m.*c+E.*c.^2+B.*c+F.*m)+...
             x.*(C.*c.^3/3+D/2.*c.^2+F.*c));
         ftrapsum = sum(reshape(ftrap,2*size(ftrap,1),size(coeffs,2)));
         
-%         testpts = [meshFaceCentroids(v3,f3),z*ones(length(f3),1)];
-%         BB = polyhedronField(verticesAtemp,magAtemp,testpts);
-%         areas = repmat(meshFaceAreas(v3,f3),1,3);
-%         expected = MdotN(i)*sum(BB.*abs(areas));
+        testpts = [meshFaceCentroids(v3,f3),z*ones(length(f3),1)];
+        BB = polyhedronField(verticesAtemp,magAtemp,testpts);
         
-        Forcepoly = Forcepoly + MdotN(i)*ftrapsum;
+        
+        Forcepoly = Forcepoly + ftrapsum;
         
     end
-    Forcepoly = Forcepoly*Rn;
+    Forcepoly = MdotN(i)*Forcepoly*Rn;
     
     Force = Force + Forcepoly;
 end
