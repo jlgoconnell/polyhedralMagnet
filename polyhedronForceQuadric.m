@@ -67,22 +67,24 @@ for i = 1:length(FacB)
         for k = 1:length(f3)/4
             f4(k,1:6) = unique(f3(4*k-3:4*k,:))';
         end
-        fieldpts = [v3(f4,:),z*ones(numel(f4),1)];
+%         fieldpts = [v3(f4,:),z*ones(numel(f4),1)];
+        fieldpts = [v3,z*ones(length(v3),1)];
         % Calculate the field at each point:
         Bfield = polyhedronField(verticesAtemp,magAtemp,fieldpts,FacA);
+        Bfield = Bfield(f4',:);
         
 %         quiver3(fieldpts(:,1),fieldpts(:,2),fieldpts(:,3),Bfield(:,1),Bfield(:,2),Bfield(:,3))
         
         % Set up sparse matrix:
-        A = sparse(6*size(f2,1),6*size(f2,1));
+        AA = sparse(6*size(f2,1),6*size(f2,1));
         for k = 1:size(f4,1)
             x = v3(f4(k,:),1);
             y = v3(f4(k,:),2);
-            A(6*k-5:6*k,6*k-5:6*k) = [x.^2,x,y.^2,y,x.*y,ones(6,1)];
+            AA(6*k-5:6*k,6*k-5:6*k) = [x.^2,x,y.^2,y,x.*y,ones(6,1)];
         end
         
         % Solve for coefficients:
-        coeffs = A\Bfield;
+        coeffs = AA\Bfield;
         A = repelem(coeffs(1:6:end,:),2,2);
         B = repelem(coeffs(2:6:end,:),2,2);
         C = repelem(coeffs(3:6:end,:),2,2);
@@ -146,7 +148,7 @@ for i = 1:length(FacB)
 %         testpts = [meshFaceCentroids(v3,f3),z*ones(length(f3),1)];
 %         BB = polyhedronField(verticesAtemp,magAtemp,testpts);
 %         areas = repmat(meshFaceAreas(v3,f3),1,3);
-%         expected = MdotN(i)*sum(BB.*abs(areas));
+%         expected = sum(BB.*abs(areas));
         
         Forcepoly = Forcepoly + MdotN(i)*ftrapsum;
         
