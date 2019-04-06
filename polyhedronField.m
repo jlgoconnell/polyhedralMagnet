@@ -14,12 +14,14 @@
 %
 % James O'Connell 20th Feb 2019.
 
-function B = polyhedronField(vertices, mag, obspt)
+function B = polyhedronField(vertices, mag, obspt, Fac, varargin)
 
 B = zeros(size(obspt));
 
-% Get face and vertex information of the polyhedron using Geom3D
-Fac = minConvexHull(vertices);
+% Get face and vertex information of the polyhedron
+if nargin < 4
+    Fac = minConvexHull(vertices);
+end
 [Ver,~] = surfToMesh(vertices(:,1),vertices(:,2),vertices(:,3));
 norms = meshFaceNormals(Ver,Fac);
 MdotN = 1/(pi*4e-7)*dot(repmat(mag,size(norms,1),1)',norms')';
