@@ -23,7 +23,7 @@ hold on;
 plot(Sb);
 grid on;
 
-[Flinear,~,~,tlinear] = polyhedronForce(verticesA,verticesB,magA,magB,mean(verticesB),1e-30,20);
+[Flinear,~,~,tlinear] = polyhedronForce(verticesA,verticesB,magA,magB,mean(verticesB),1e-30,60);
 Flinear(1,:) = [];
 % polyhedronForceQuadric(verticesA,verticesB,magA,magB,16)
 
