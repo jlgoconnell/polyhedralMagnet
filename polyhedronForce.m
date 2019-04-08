@@ -65,7 +65,7 @@ while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
     MdotN = 1/(pi*4e-7)*dot(repmat(magB,size(n,1),1)',n')';
     Fac = Fac(abs(MdotN)>eps);
     [Fac,~] = triangulateFaces(Fac);
-    [Ver,Fac] = subdivideMesh(Ver,Fac,2+i);
+    [Ver,Fac] = subdivideMesh(Ver,Fac,i+1);
     n = meshFaceNormals(Ver,Fac);
     
     % Calculate field

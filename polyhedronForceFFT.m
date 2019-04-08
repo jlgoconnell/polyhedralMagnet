@@ -67,7 +67,7 @@ for i = 1:length(Fac)
     y = linspace(ystart,yend,n);
     [X,Y] = meshgrid(x,y);
     B = polyhedronField(Apts,Amag,[X(:),Y(:),repmat(z,size(X(:)))]);
-    size(X(:))
+%     size(X(:))
     Bx = reshape(B(:,1),size(X));
     ffx = fft2(Bx);
     By = reshape(B(:,2),size(X));
