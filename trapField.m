@@ -51,6 +51,7 @@ C = (c+m.*x-y).^2.*(xq-x)+(z-zd).^2.*(m.^2.*(x-xq)+2*m.*(c-y+m.*x));
 D = (z-zd).*(-(c-y).^2+2*m.*(xq-2*x).*(c-y)+m.^2.*x.*(-3*x+2*xq)+m.^2.*(z-zd).^2);
 R = c.*m-x+xq+m.^2.*xq-m.*y+sqrtm.*S;
 myBx = (2*[-1,1,1,-1].*m./sqrtm.*log(R)+[1,1,-1,-1].*log((M.^2+N.^2)./(C.^2+D.^2)));
+myBx(isinf(myBx)) = 0;
 Bx = MdotN/(8*pi)*sum(myBx,2);
 myBy = -[-1,1,1,-1]./sqrtm.*log(-x+xq+m.*(c+m.*xq-y)+sqrtm.*S);
 By = MdotN/(4*pi)*sum(myBy,2);

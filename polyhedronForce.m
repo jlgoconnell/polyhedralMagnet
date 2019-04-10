@@ -65,7 +65,9 @@ while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
     MdotN = 1/(pi*4e-7)*dot(repmat(magB,size(n,1),1)',n')';
     Fac = Fac(abs(MdotN)>eps);
     [Fac,~] = triangulateFaces(Fac);
-    [Ver,Fac] = subdivideMesh(Ver,Fac,i+1);
+    if i > 1
+        [Ver,Fac] = subdivideMesh(Ver,Fac,i);
+    end
     n = meshFaceNormals(Ver,Fac);
     
     % Calculate field
@@ -75,7 +77,6 @@ while max(abs(C(end,:)-C(end-1,:))) > tolerance && toc < timeout
     obspt = meshFaceCentroids(Ver,Fac);
     MdotN = MdotN(abs(MdotN)>1e-8,:);
     B = polyhedronField(verticesA,magA,obspt);
-    size(obspt)
     
     % Calculate force and torque
     F(end+1,:) = sum(B.*MdotN.*dA,1);
