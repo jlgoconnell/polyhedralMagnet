@@ -39,7 +39,7 @@ verticesA = verticesA*R_x;
 Sa = alphaShape(verticesA,Inf);
 magA = [0,0,1];
 verticesB = verticesA + repmat([0.004,-0.003,0],length(verticesA),1);
-verticesB = verticesB + repmat([0,0,0.001-min(verticesB(:,3))+max(verticesA(:,3))],length(verticesB),1);
+verticesB = verticesB + repmat([0,0,0.01-min(verticesB(:,3))+max(verticesA(:,3))],length(verticesB),1);
 verticesB = verticesB*[cosd(36),-sind(36),0;sind(36),cosd(36),0;0,0,1];
 Sb = alphaShape(verticesB,Inf);
 magB = [0,0,-1];
@@ -70,7 +70,7 @@ magB = [0,0,-1];
 % tgauss = ttotalgauss;
 % 
 
-for i = 15
+for i = 1:50
     i
     [Fold(i,:),Told(i,:),told(i,1)] = polyhedronForce(verticesA,verticesB,magA,magB,i,mean(verticesB));
     [Fgauss(i,:),Tgauss(i,:),tgauss(i,1)] = polyhedronForceGauss(verticesA,verticesB,magA,magB,i,mean(verticesB));
