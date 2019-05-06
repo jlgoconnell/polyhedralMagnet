@@ -21,7 +21,7 @@
 % F: A vector representing the x, y, and z forces on magnet B.
 % T: A vector representing the x, y, and z torques on magnet B.
 
-function [F,T,C,t] = polyhedronForce(verticesA,verticesB,magA,magB,meshnum,torquepoint,varargin)
+function [F,T,t] = polyhedronForceDumb(verticesA,verticesB,magA,magB,meshnum,torquepoint,varargin)
 
 % If missing arguments:
 if nargin < 7
@@ -34,7 +34,7 @@ if nargin < 5
     torquepoint = mean(verticesB);
 end
 
-% tic;
+tic;
 
 % Initial conditions
 % F = [0,0,0];
@@ -79,22 +79,22 @@ end
     B = polyhedronField(verticesA,magA,obspt);
     
     % Calculate force and torque
-    F(end+1,:) = sum(B.*MdotN.*dA,1);
+    F = sum(B.*MdotN.*dA,1);
     myleverpoint = obspt-torquepoint;
-    T(end+1,:) = sum(MdotN.*cross(myleverpoint,B).*dA);
+    T = sum(MdotN.*cross(myleverpoint,B).*dA);
     
-    meshnum = meshnum + 1;
-    ctr = ctr + 1;
+%     meshnum = meshnum + 1;
+%     ctr = ctr + 1;
     
-    if ctr >= 2
-        C(end+1,:) = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
-    else
-        C(end+1,1:6) = zeros(1,6);
-    end
+%     if ctr >= 2
+%         C(end+1,:) = [(F(end-2,:).*F(end,:)-F(end-1,:).^2)./(F(end-2,:)-2*F(end-1,:)+F(end,:)),(T(end-2,:).*T(end,:)-T(end-1,:).^2)./(T(end-2,:)-2*T(end-1,:)+T(end,:))];
+%     else
+%         C(end+1,1:6) = zeros(1,6);
+%     end
     
     
     
-    t(end+1,1) = toc;
+%     t(end+1,1) = toc;
     
 %     if ctr > 1
 %         subplot(2,3,1);
@@ -138,7 +138,7 @@ end
     
 % end
 
-C = C(3:end,:);
+% C = C(3:end,:);
 % 
 % figure;
 % drawMesh(Ver,Fac,'white')
@@ -159,7 +159,7 @@ C = C(3:end,:);
 
 % ctr
 
-toc
+t = toc;
 
 % max(abs(C(end,:)-[F(end,:),T(end,:)]))
 
