@@ -13,10 +13,10 @@ V = 1e-4;       % Volume of each frustum
 M = [0,0,1.3];  % Magnetisations in Teslas
 d = 0.02;       % Distance between magnets
 
-distances = 0.001:0.001:0.06;
+distances = 0.02;%0.001:0.001:0.06;
 optH = zeros(length(distances),1);
 optTheta = optH;
-parfor k = 1:length(distances)
+for k = 1:length(distances)
 d = distances(k);
 
 % Define varying parameters
@@ -39,7 +39,7 @@ for i = 1:length(h)
                 -bu/2,-bu/2,-H(i,j);-bu/2,bu/2,-H(i,j);bu/2,-bu/2,-H(i,j);bu/2,bu/2,-H(i,j)];
             verticesB = -verticesA + repmat([0,0,d],size(verticesA,1),1);
             
-            [myF,~,~] = polyhedronForce(verticesB,verticesA,M,M,10,mean(verticesB));
+            [myF,~,~] = polyhedronForce(verticesB,verticesA,M,M,12,mean(verticesB));
             F(i,j) = myF(3);
             
 %             figure;

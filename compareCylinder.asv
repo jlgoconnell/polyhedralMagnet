@@ -1,0 +1,24 @@
+
+% Script to compare the force between approximated cylinders using my code,
+% to exact cylinders using Will's code
+%
+% James O'Connell 9th May 2019
+
+theta = linspace(0,2*pi,21);
+theta = theta(1:end-1)';
+h = 0.02;
+r = 0.02;
+verticesA = [r*cos(theta),r*sin(theta),zeros(size(theta));r*cos(theta),r*sin(theta),-h*ones(size(theta))];
+
+mag
+
+d = 0.001:0.001:0.01;
+
+for i = 1:length(d)
+    verticesB = [verticesA(:,1:2),-verticesA(:,3)+d(i)*ones(length(verticesA),1)];
+    
+    
+    
+    
+    
+end
