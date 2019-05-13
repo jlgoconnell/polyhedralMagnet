@@ -10,8 +10,9 @@ clc;
 
 magA = [0,0,-1];
 magB = [0,0,1];
-n = 101;
+n = 33;
 theta = linspace(0,2*pi,n);
+theta = theta + diff(theta(1:2));
 theta = theta(1:end-1)';
 h = 0.02;
 r = 0.02;
@@ -25,7 +26,7 @@ d = 0.001:0.001:0.02;
 for i = 1:length(d)
     verticesB = [verticesA(:,1:2),-verticesA(:,3)+d(i)*ones(length(verticesA),1)];
     
-    [Ftemp,~,tapprox(i)] = polyhedronForce(verticesA,verticesB,magA,magB,6,mean(verticesB));
+    [Ftemp,~,tapprox(i)] = polyhedronForce(verticesA,verticesB,magA,magB,8,mean(verticesB));
     Fapprox(i,:) = Ftemp;
     
     
