@@ -1,0 +1,39 @@
+
+clear;
+clc;
+close all;
+
+V = 1e-4;
+M = [0,0,1];
+
+x0 = [0.04,75];
+A = [];
+b = [];
+Aeq = [];
+beq = [];
+lb = [0.0,0];
+ub = [0.05,89];
+
+myd = 0.07:0.05:1;
+
+for i = 1:length(myd)
+    d = myd(i);
+    
+    fun = @(x) calcFrustaForce(x(1),x(2),M,V,d);
+    nonlcon = [@(x) (x(1)-sqrt(
+    
+%     save('frustumvars.mat','V','d','M');
+
+    x = fmincon(fun,x0,A,b,Aeq,beq,lb,ub);
+    x(1) = x(1)*1000;
+
+    X(i,:) = x;
+    x0 = [x(1)/1000,x(2)];
+end
+
+yyaxis left
+plot(myd*1000,X(:,1))
+hold on
+grid on
+yyaxis right
+plot(myd*1000,X(:,2))
