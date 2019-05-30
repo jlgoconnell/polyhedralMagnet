@@ -14,7 +14,7 @@ beq = [];
 lb = [0,0];
 ub = [];
 
-myd = 0.001:0.0005:0.06;
+myd = 0.0005:0.0005:0.1;
 F = zeros(length(myd),0);
 
 for i = 1:length(myd)
@@ -30,7 +30,7 @@ for i = 1:length(myd)
     
     i/length(myd)*100
 end
-F = -F;
+F = -F';
 
 yyaxis left
 plot(myd*1000,X(:,1))
@@ -38,3 +38,20 @@ hold on
 grid on
 yyaxis right
 plot(myd*1000,X(:,2))
+
+pcscale = 0.4;
+l = (V/pcscale)^(1/3);
+h = (pcscale^2*V)^(1/3);
+magnet_fixed = magnetdefine('type','cuboid','dim',[l l h],'magn',1,'magdir','z');
+magnet_float = magnetdefine('type','cuboid','dim',[l l h],'magn',1,'magdir','z');
+N = length(myd);
+offset = repmat([0; 0; h],[1 N]);
+displ_range = offset+[0;0;1]*myd;
+Fcuboid = magnetforces(magnet_fixed,magnet_float,displ_range);
+Fcuboid = -Fcuboid(3,:)';
+
+pcincrease = (F-Fcuboid)./Fcuboid*100;
+
+
+
+
