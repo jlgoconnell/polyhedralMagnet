@@ -67,14 +67,14 @@ ylabel('Force (N)');
 title('Force between two vertically magnetised cuboidal permanent magnets');
 
 figure;
-p1 = plot(d,Tapprox(:,i),'ko');
+p1 = plot(d,1000*Tapprox(:,i),'ko');
 hold on;
-p2 = plot(d,FEA.Tfea(:,i),'k.');
-p3 = plot(exactd,Texact(:,i),'k-');
+p2 = plot(d,1000*FEA.Tfea(:,i),'k.');
+p3 = plot(exactd,1000*Texact(:,i),'k-');
 grid on;
 legend([p1(1),p2(1),p3(1)],{'This work','FEA','Analytic solution'});
 xlabel('Separation distance, d (mm)');
-ylabel('Torque (Nm)');
+ylabel('Torque (mNm)');
 title('Torque between two vertically magnetised cuboidal permanent magnets');
 
 errorapprox = abs(Fapprox-Fexactd);
@@ -97,3 +97,31 @@ grid on;
 % grid on;
 % ylim([-10,10]);
 % legend('Approxx','Approxy','Approxz','FEAx','FEAy','FEAz');
+
+figure;
+thing = ['x','y','z'];
+for i = 1:3
+    subplot(2,3,i);
+    p1 = plot(d,Fapprox(:,i),'ko');
+    hold on;
+    p2 = plot(d,FEA.Ffea(:,i),'k.');
+    p3 = plot(exactd,Fexact(:,i),'k-');
+    grid on;
+%     legend([p1(1),p2(1),p3(1)],{'This work','FEA','Analytic solution'});
+    xlabel('Separation distance, d (mm)');
+    ylabel([thing(i),'-Force (N)']);
+    
+    subplot(2,3,i+3);
+    p1 = plot(d,1000*Tapprox(:,i),'ko');
+    hold on;
+    p2 = plot(d,1000*FEA.Tfea(:,i),'k.');
+    p3 = plot(exactd,1000*Texact(:,i),'k-');
+    grid on;
+%     legend([p1(1),p2(1),p3(1)],{'This work','FEA','Analytic solution'});
+    xlabel('Separation distance, d (mm)');
+    ylabel([thing(i),'-Torque (mNm)']);
+end
+
+
+
+
