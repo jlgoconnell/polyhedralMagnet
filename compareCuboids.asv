@@ -61,10 +61,10 @@ hold on;
 p2 = plot(d,FEA.Ffea(:,i),'k.');
 p3 = plot(exactd,Fexact(:,i),'k-');
 grid on;
-legend([p1(1),p2(1),p3(1)],{'This work','FEA','Analytic solution'},'Location','SouthEast');
+legend([p1(1),p2(1),p3(1)],{'This work','FEA','Analytic solution'});
 xlabel('Separation distance, d (mm)');
 ylabel('Force (N)');
-title('Force between cuboidal permanent magnets');
+title('Force between two vertically magnetised cuboidal permanent magnets');
 
 figure;
 p1 = plot(d,1000*Tapprox(:,i),'ko');
@@ -75,7 +75,7 @@ grid on;
 legend([p1(1),p2(1),p3(1)],{'This work','FEA','Analytic solution'},'Location','SouthEast');
 xlabel('Separation distance, d (mm)');
 ylabel('Torque (mNm)');
-title('Torque between cuboidal permanent magnets');
+title('Torque between two vertically magnetised cuboidal permanent magnets');
 
 errorapprox = abs(Fapprox-Fexactd);
 errorfea = abs(FEA.Ffea-Fexactd);

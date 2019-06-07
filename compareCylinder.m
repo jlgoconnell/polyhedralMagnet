@@ -78,7 +78,7 @@ grid on;
 legend('This work','FEA','Analytic solution');
 xlabel('Separation distance, d (mm)');
 ylabel('z-Force (N)');
-title('z-Force between two axially magnetised cylindrical permanent magnets');
+title('z-Force between two cylindrical permanent magnets');
 
 errorapprox = abs(Fapprox(:,3)-Fexactd(:,3));
 errorfea = abs(Ffea(:,3)-Fexactd(:,3));

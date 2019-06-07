@@ -34,19 +34,12 @@ frustum = @(bnominal,h,theta) [(bnominal-h/tand(theta))/2,(bnominal-h/tand(theta
     -(bnominal+h/tand(theta))/2,(bnominal+h/tand(theta))/2,-h/2;...
     (bnominal+h/tand(theta))/2,-(bnominal+h/tand(theta))/2,-h/2;...
     -(bnominal+h/tand(theta))/2,-(bnominal+h/tand(theta))/2,-h/2];
-pyramid = @(l,b,h) [0,0,h/2;l/2,b/2,-h/2;l/2,-b/2,-h/2;-l/2,b/2,-h/2;-l/2,-b/2,-h/2];    
 
-% verticesC = frustum(0.0194,0.01,130) + repmat([0,0,0.005],8,1); % Frustum
-verticesC = cuboid(0.02,0.02,0.01) + repmat([0,0,0.005],8,1); % Cuboid
+verticesC = frustum(0.0194,0.01,130) + repmat([0,0,0.005],8,1); % Frustum
+% verticesC = cuboid(0.02,0.02,0.01) + repmat([0,0,0.005],8,1); % Cuboid
 verticesC = verticesC + repmat([0,0,-max(verticesC(:,3))],length(verticesC),1);
-h = 0.016;
-verticesD = cuboid(0.02,0.02,h) + repmat([0.039,0,0.025],length(verticesC),1); % Cuboid
-% verticesD = frustum(0.02,0.01,70)*[0,0,1;0,1,0;-1,0,0]+repmat([0.033,0,0.025],8,1); % Frustum
+verticesD = cuboid(0.02,0.02,0.01) + repmat([0.033,0,0.03-0.005],length(verticesC),1);
 verticesE = [-verticesD(:,1),verticesD(:,2:3)];
-
-h = 0.008;
-b = 0.035;
-verticesC = -pyramid(b,b,h) + repmat([0,0,-h/4-0.005],5,1);
 
 magnet{1} = verticesC;
 magnet{2} = verticesD;
@@ -57,7 +50,7 @@ magnet{5} = verticesE*[0,-1,0;1,0,0;0,0,1];
 magnet{6} = verticesD*[0,-1,0;1,0,0;0,0,1];
 
 myverticesB = cuboid(0.01,0.01,0.01) + repmat([0,0,0.005],8,1);
-magB = [0,0,-1];
+magB = [0,0,1];
 
 magnitude{1} = [0,0,1];
 magnitude{2} = [0,0,1];
@@ -66,7 +59,7 @@ magnitude{4} = [0,0,1];
 magnitude{5} = [0,0,1];
 magnitude{6} = [0,0,1];
 
-d = linspace(0.00,0.04,52);
+d = linspace(0.01,0.03,51);
 d = d(2:end-1);
 
 F = zeros(length(d),1);
@@ -100,7 +93,7 @@ subplot(2,2,3);
 plot(d,K);
 ylabel('Stiffness');
 grid on;
-% ylim([600,800]);
+ylim([600,800]);
 subplot(2,2,2);
 s = alphaShape(verticesB,inf);
 plot(s);
