@@ -38,20 +38,20 @@ h = hc
 b = sqrt(3*bc^2*hc/h)
 hcc = 0.00;
 V = pyramid(b,b,h);
-magnetp{1} = [-V;-V(2:5,:)+repmat([0,0,hcc],4,1)] + repmat([0,0,-((6*hcc^2+4*h*hcc+h^2)/(12*hcc+4*h))-hc/4],9,1);
-magnetp{2} = [V;V(2:5,:)+repmat([0,0,-hcc],4,1)] + repmat([0,0,Height],9,1) + repmat([0,0,hc/4+((6*hcc^2+4*h*hcc+h^2)/(12*hcc+4*h))],9,1);
+magnetp{1} = [-V] + repmat([0,0,-((6*hcc^2+4*h*hcc+h^2)/(12*hcc+4*h))-hc/4],5,1);
+magnetp{2} = [V] + repmat([0,0,Height],5,1) + repmat([0,0,hc/4+((6*hcc^2+4*h*hcc+h^2)/(12*hcc+4*h))],5,1);
 % magnetp{2} = pyramid(b,b,h) + repmat([0,0,Height+hc/2+h/4],5,1);
 
 bf = bc;
 hfc = hc;
 magnetfc = cuboid(bf,bf,hfc) + repmat([0,0,hfc/2],8,1);
-dc = linspace(0,Height-hfc,202);
+dc = linspace(0,Height-hfc,201);
 dc = dc(2:end-1);
 
 bf = bc;
 hfp = hc*bc^2/bf^2;
 magnetfp = cuboid(bf,bf,hfp) + repmat([0,0,hfp/2],8,1);
-dp = linspace(0,Height-hfp,202);
+dp = linspace(0,Height-hfp,201);
 dp = dp(2:end-1);
 
 sc1 = alphaShape(magnetc{1},inf);
@@ -70,7 +70,7 @@ magdown = [0,0,-1.3];
 for i = 1:length(dc)
     magnetFc = magnetfc + repmat([0,0,dc(i)],8,1);
     
-    FFc = polyhedronForce(magnetc{1},magnetFc,magdown,magup,12,mean(magnetfc));
+    FFc = polyhedronForce(magnetc{1},magnetFc,magdown,magup,16,mean(magnetfc));
     FFc = FFc + polyhedronForce(magnetc{2},magnetFc,magup,magup,16,mean(magnetfc));
     Fc(i) = FFc(3);
     
@@ -81,10 +81,15 @@ for i = 1:length(dp)
     
     magnetFp = magnetfp + repmat([0,0,dp(i)],8,1);
     
-    FFp = polyhedronForce(magnetp{1},magnetFp,magdown,magup,12,mean(magnetfp));
+    FFp = polyhedronForce(magnetp{1},magnetFp,magdown,magup,16,mean(magnetfp));
     FFp = FFp + polyhedronForce(magnetp{2},magnetFp,magup,magup,16,mean(magnetfp));
     Fp(i) = FFp(3);
 end
+
+dFE = 0.002:0.002:0.018;
+FcFE = [154.79,120.5,100.98,90.658,87.394,90.668,100.98,120.51,154.76];
+FpFE = [130.1,113.29,101.49,94.561,92.28,94.582,101.49,113.3,130.1];
+dFE = dFE(1:length(FpFE));
 
 % Fc
 % Fp
@@ -94,15 +99,15 @@ Kc = -[(Fc(2)-Fc(1))/dd,(Fc(3:end)-Fc(1:end-2))/(2*dd),(Fc(end)-Fc(end-1))/dd];
 Kp = -[(Fp(2)-Fp(1))/dd,(Fp(3:end)-Fp(1:end-2))/(2*dd),(Fp(end)-Fp(end-1))/dd];
 
 subplot(2,3,[1,2]);
-plot(dc,Fc,dp,Fp);
+plot(dc,Fc,dp,Fp,dFE,FcFE,'k.',dFE,FpFE,'k.');
 grid on;
-legend('Cuboid','Pyramid');
+legend('Cuboid','Pyramid','FEA results');
 title('Force-displacement curve');
 xlabel('Vertical displacement (m)');
 ylabel('Force (N)');
 axis tight;
 V = axis;
-axis([0,V(1)+V(2),0,1.1*V(4)]);
+% axis([0,V(1)+V(2),0,1.1*V(4)]);
 
 sfc.Points = sfc.Points + repmat([0,0,mean(dc)],length(sfc.Points),1);
 subplot(2,3,3);
@@ -114,14 +119,17 @@ title('Cuboidal geometry');
 
 subplot(2,3,[4,5]);
 plot(dc,Kc,dp,Kp);
+hold on
+plot((dFE(2:end)+dFE(1:end-1))/2,-diff(FcFE)/0.002,'k.');
+plot((dFE(2:end)+dFE(1:end-1))/2,-diff(FpFE)/0.002,'k.');
 grid on;
-legend('Cuboid','Pyramid');
+legend('Cuboid','Pyramid','FEA results');
 title('Stiffness-displacement curve');
 xlabel('Vertical displacement (m)');
 ylabel('Stiffness (N/m)');
 axis tight;
 V = axis;
-axis([0,V(1)+V(2),V(3)/1.1,V(4)*1.1]);
+% axis([0,V(1)+V(2),V(3)/1.1,V(4)*1.1]);
 
 sfp.Points = sfp.Points + repmat([0,0,mean(dc)],length(sfp.Points),1);
 subplot(2,3,6);
