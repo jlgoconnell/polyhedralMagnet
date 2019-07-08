@@ -1,9 +1,13 @@
 
 
 
-function [F,T,t] = polyhedronForce(verticesA,verticesB,magA,magB,meshnum,torquept)
+function [F,T,t] = polyhedronForce(verticesA,verticesB,magA,magB,meshnum,torquept,d,varargin)
 
 tic;
+
+if nargin < 7
+    d = [0,0,0];
+end
 
 f = minConvexHull(verticesB);
 [v,~] = surfToMesh(verticesB(:,1),verticesB(:,2),verticesB(:,3));
@@ -27,21 +31,23 @@ areas = meshFaceAreas(v,f);
 midpts = 0.5*(v(e(:,1),:)+v(e(:,2),:));
 fmids = reshape(IE,3,numel(IE)/3)';
 
-if iscell(verticesA)
-    Bfield = [0,0,0];
-    for i = 1:length(verticesA)
-        Bfieldtemp = polyhedronField(verticesA{i},magA{i},midpts);
-        Bfield = Bfield + Bfieldtemp;
+for i = 1:size(d,1)
+    midptsd = midpts + repmat(d(i,:),size(midpts,1),1);
+    
+    if iscell(verticesA)
+        Bfield = [0,0,0];
+        for j = 1:length(verticesA)
+            Bfieldtemp = polyhedronField(verticesA{j},magA{j},midptsd);
+            Bfield = Bfield + Bfieldtemp;
+        end
+    else
+        Bfield = polyhedronField(verticesA,magA,midptsd);
     end
-else
-    Bfield = polyhedronField(verticesA,magA,midpts);
+
+    F(i,:) = sum(Bfield(fmids',:).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
+    myleverpoint = midptsd(fmids',:)-torquept;
+    T(i,:) = sum(cross(myleverpoint,Bfield(fmids',:)).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
+    t(i) = toc;
 end
-
-
-
-F = sum(Bfield(fmids',:).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
-myleverpoint = midpts(fmids',:)-torquept;
-T = sum(cross(myleverpoint,Bfield(fmids',:)).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
-t = toc;
 
 end

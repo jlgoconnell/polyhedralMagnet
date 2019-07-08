@@ -45,14 +45,16 @@ magnetp{2} = [V] + repmat([0,0,Height],5,1) + repmat([0,0,hc/4+((6*hcc^2+4*h*hcc
 bf = bc;
 hfc = hc;
 magnetfc = cuboid(bf,bf,hfc) + repmat([0,0,hfc/2],8,1);
-dc = linspace(0,Height-hfc,21);
+dc = linspace(0,Height-hfc,201);
 dc = dc(2:end-1);
+dc = [zeros(length(dc),2),dc'];
 
 bf = bc;
 hfp = hc*bc^2/bf^2;
 magnetfp = cuboid(bf,bf,hfp) + repmat([0,0,hfp/2],8,1);
-dp = linspace(0,Height-hfp,21);
+dp = linspace(0,Height-hfp,201);
 dp = dp(2:end-1);
+dp = [zeros(length(dp),2),dp'];
 
 % magnetp{1}(1,3) = -0.04;
 
@@ -69,21 +71,27 @@ volume(sp1)
 magup = [0,0,1.3];
 magdown = [0,0,-1.3];
 
-for i = 1:length(dc)
-    magnetFc = magnetfc + repmat([0,0,dc(i)],8,1);
-    
-    Fctemp = polyhedronForce(magnetc,magnetFc,{magdown,magup},magup,16,mean(magnetfc));
-    Fc(i) = Fctemp(3);
-    
-end
+Fctemp = polyhedronForce(magnetc,magnetfc,{magdown,magup},magup,16,mean(magnetfc),dc);
+Fc = Fctemp(:,3);
+Fptemp = polyhedronForce(magnetp,magnetfp,{magdown,magup},magup,16,mean(magnetfp),dp);
+Fp = Fptemp(:,3);
 
-for i = 1:length(dp)
-    
-    magnetFp = magnetfp + repmat([0,0,dp(i)],8,1);
-    
-    Fptemp = polyhedronForce(magnetp,magnetFp,{magdown,magup},magup,16,mean(magnetfp));
-    Fp(i) = Fptemp(3);
-end
+
+% for i = 1:length(dc)
+%     magnetFc = magnetfc + repmat([0,0,dc(i)],8,1);
+%     
+%     Fctemp = polyhedronForce(magnetc,magnetFc,{magdown,magup},magup,16,mean(magnetfc));
+%     Fc(i) = Fctemp(3);
+%     
+% end
+% 
+% for i = 1:length(dp)
+%     
+%     magnetFp = magnetfp + repmat([0,0,dp(i)],8,1);
+%     
+%     Fptemp = polyhedronForce(magnetp,magnetFp,{magdown,magup},magup,16,mean(magnetfp));
+%     Fp(i) = Fptemp(3);
+% end
 
 dFE = 0.002:0.002:0.018;
 FcFE = [154.79,120.5,100.98,90.658,87.394,90.668,100.98,120.51,154.76];
@@ -93,9 +101,12 @@ dFE = dFE(1:length(FpFE));
 % Fc
 % Fp
 
-dd = dc(2)-dc(1);
-Kc = -[(Fc(2)-Fc(1))/dd,(Fc(3:end)-Fc(1:end-2))/(2*dd),(Fc(end)-Fc(end-1))/dd];
-Kp = -[(Fp(2)-Fp(1))/dd,(Fp(3:end)-Fp(1:end-2))/(2*dd),(Fp(end)-Fp(end-1))/dd];
+dd = dc(2,3)-dc(1,3);
+Kc = -[(Fc(2)-Fc(1))/dd;(Fc(3:end)-Fc(1:end-2))/(2*dd);(Fc(end)-Fc(end-1))/dd];
+Kp = -[(Fp(2)-Fp(1))/dd;(Fp(3:end)-Fp(1:end-2))/(2*dd);(Fp(end)-Fp(end-1))/dd];
+
+dc = dc(:,3);
+dp = dp(:,3);
 
 subplot(2,3,[1,2]);
 plot(dc,Fc,dp,Fp,dFE,FcFE,'k.',dFE,FpFE,'k.');
