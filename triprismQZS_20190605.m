@@ -71,10 +71,10 @@ volume(sp1)
 magup = [0,0,1.3];
 magdown = [0,0,-1.3];
 
-Fctemp = polyhedronForce(magnetc,magnetfc,{magdown,magup},magup,16,mean(magnetfc),dc);
-Fc = Fctemp(:,3);
-Fptemp = polyhedronForce(magnetp,magnetfp,{magdown,magup},magup,16,mean(magnetfp),dp);
-Fp = Fptemp(:,3);
+% Fctemp = polyhedronForce(magnetc,magnetfc,{magdown,magup},magup,16,mean(magnetfc),dc);
+% Fc = Fctemp(:,3);
+% Fptemp = polyhedronForce(magnetp,magnetfp,{magdown,magup},magup,16,mean(magnetfp),dp);
+% Fp = Fptemp(:,3);
 
 
 % for i = 1:length(dc)
@@ -85,13 +85,13 @@ Fp = Fptemp(:,3);
 %     
 % end
 % 
-% for i = 1:length(dp)
-%     
-%     magnetFp = magnetfp + repmat([0,0,dp(i)],8,1);
-%     
-%     Fptemp = polyhedronForce(magnetp,magnetFp,{magdown,magup},magup,16,mean(magnetfp));
-%     Fp(i) = Fptemp(3);
-% end
+for i = 1:length(dp)
+    
+    magnetFp = magnetfp + repmat([0,0,dp(i)],8,1);
+    
+    Fptemp = polyhedronForce(magnetp,magnetFp,{magdown,magup},magup,16,mean(magnetfp));
+    Fp(i) = Fptemp(3);
+end
 
 dFE = 0.002:0.002:0.018;
 FcFE = [154.79,120.5,100.98,90.658,87.394,90.668,100.98,120.51,154.76];

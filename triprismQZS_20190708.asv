@@ -1,0 +1,51 @@
+
+% Script to mess with magnets using multi-magnet systems and displacement
+% stuff implemented in my code
+
+close all;
+clear;
+clc;
+
+cuboid = @(l,b,h) [l/2,b/2,h/2;l/2,-b/2,h/2;-l/2,b/2,h/2;-l/2,-b/2,h/2;l/2,b/2,-h/2;l/2,-b/2,-h/2;-l/2,b/2,-h/2;-l/2,-b/2,-h/2];
+pyramid = @(l,b,h) [0,0,h/2;l/2,b/2,-h/2;l/2,-b/2,-h/2;-l/2,b/2,-h/2;-l/2,-b/2,-h/2];
+
+magnetfloat = cuboid(0.02,0.02,0.02);
+magnitudefloat = 1.3*[0,0,1];
+
+n = 201;
+d = [zeros(n+2,2),linspace(-0.01,0.01,n+2)'];
+d = d(2:end-1,:);
+
+b = sqrt(3)*0.02;
+V = pyramid(b,b,0.02);
+magnet1 = -V + repmat([0,0,-0.02],5,1) + repmat([0,0,-0.01],5,1);
+magnitude1 = 1.3*[0,0,-1];
+magnet2 = V + repmat([0,0,0.02],5,1) + repmat([0,0,0.01],5,1);
+magnitude2 = 1.3*[0,0,1];
+% magnet3 = 
+
+magnetfixed = {magnet1,magnet2};
+magnitudefixed = {magnitude1,magnitude2};
+
+[F,T,t] = polyhedronForce(magnetfixed,magnetfloat,magnitudefixed,magnitudefloat,16,mean(magnetfloat),d);
+
+mf = alphaShape(magnetfloat,inf);
+figure;
+plot(mf);
+hold on;
+for i = 1:length(magnetfixed)
+    m = alphaShape(magnetfixed{i},inf);
+    plot(m);
+end
+
+m1 = alphaShape(magnet1,inf);
+m2 = alphaShape(magnet2,inf);
+
+figure;
+plot(m1);
+hold on;
+plot(m2);
+plot(mf);
+
+figure;
+plot(d,F);

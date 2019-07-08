@@ -31,17 +31,27 @@ areas = meshFaceAreas(v,f);
 midpts = 0.5*(v(e(:,1),:)+v(e(:,2),:));
 fmids = reshape(IE,3,numel(IE)/3)';
 
+% Work out the convex hull of magnet A:
+if iscell(verticesA)
+    for i = 1:length(verticesA)
+        Fac{i} = minConvexHull(verticesA{i});
+    end
+else
+    Fac = minConvexHull(verticesA);
+end
+
+% Loop through all displacements and calculate field, force, and torque:
 for i = 1:size(d,1)
     midptsd = midpts + repmat(d(i,:),size(midpts,1),1);
     
     if iscell(verticesA)
         Bfield = [0,0,0];
         for j = 1:length(verticesA)
-            Bfieldtemp = polyhedronField(verticesA{j},magA{j},midptsd);
+            Bfieldtemp = polyhedronField(verticesA{j},magA{j},midptsd,Fac{j});
             Bfield = Bfield + Bfieldtemp;
         end
     else
-        Bfield = polyhedronField(verticesA,magA,midptsd);
+        Bfield = polyhedronField(verticesA,magA,midptsd,Fac);
     end
 
     F(i,:) = sum(Bfield(fmids',:).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
