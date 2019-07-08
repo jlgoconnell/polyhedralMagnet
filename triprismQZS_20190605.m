@@ -45,14 +45,16 @@ magnetp{2} = [V] + repmat([0,0,Height],5,1) + repmat([0,0,hc/4+((6*hcc^2+4*h*hcc
 bf = bc;
 hfc = hc;
 magnetfc = cuboid(bf,bf,hfc) + repmat([0,0,hfc/2],8,1);
-dc = linspace(0,Height-hfc,201);
+dc = linspace(0,Height-hfc,21);
 dc = dc(2:end-1);
 
 bf = bc;
 hfp = hc*bc^2/bf^2;
 magnetfp = cuboid(bf,bf,hfp) + repmat([0,0,hfp/2],8,1);
-dp = linspace(0,Height-hfp,201);
+dp = linspace(0,Height-hfp,21);
 dp = dp(2:end-1);
+
+% magnetp{1}(1,3) = -0.04;
 
 sc1 = alphaShape(magnetc{1},inf);
 sp1 = alphaShape(magnetp{1},inf);
@@ -70,10 +72,8 @@ magdown = [0,0,-1.3];
 for i = 1:length(dc)
     magnetFc = magnetfc + repmat([0,0,dc(i)],8,1);
     
-    FFc = polyhedronForce(magnetc{1},magnetFc,magdown,magup,16,mean(magnetfc));
-    FFc = FFc + polyhedronForce(magnetc{2},magnetFc,magup,magup,16,mean(magnetfc));
-    Fc(i) = FFc(3);
-    
+    Fctemp = polyhedronForce(magnetc,magnetFc,{magdown,magup},magup,16,mean(magnetfc));
+    Fc(i) = Fctemp(3);
     
 end
 
@@ -81,9 +81,8 @@ for i = 1:length(dp)
     
     magnetFp = magnetfp + repmat([0,0,dp(i)],8,1);
     
-    FFp = polyhedronForce(magnetp{1},magnetFp,magdown,magup,16,mean(magnetfp));
-    FFp = FFp + polyhedronForce(magnetp{2},magnetFp,magup,magup,16,mean(magnetfp));
-    Fp(i) = FFp(3);
+    Fptemp = polyhedronForce(magnetp,magnetFp,{magdown,magup},magup,16,mean(magnetfp));
+    Fp(i) = Fptemp(3);
 end
 
 dFE = 0.002:0.002:0.018;
