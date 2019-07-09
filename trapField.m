@@ -43,7 +43,16 @@ c = c';
 xq = xq';
 sqrtm = sqrt(1+m.^2);
 
-ymxc = y==m.*xq+c; % An edge case that occurs sometimes
+p = repmat([1,2],size(m,1),2);
+q = repelem([1,2],size(m,1),2);
+mn0 = m~=0;
+m0 = m==0;
+pmn0 = reshape(p(mn0),size(m,1),[]);
+qmn0 = reshape(q(mn0),size(m,1),[]);
+pm0 = reshape(p(m0),size(m,1),[]);
+qm0 = reshape(q(m0),size(m,1),[]);
+
+% ymxc = y==m.*xq+c; % An edge case that occurs sometimes
 S = sqrt((x-xq).^2+(y-m.*xq-c).^2+(z-zd).^2);
 negS = S.*[1,-1,1,-1];
 M = (z-zd).^2.*(m.*(m.*xq+c-y)+xq-x+m.*negS);
@@ -51,15 +60,19 @@ N = -(z-zd).*((c+m.*x-y).*(c+negS+m.*xq-y)+(z-zd).^2);
 C = (c+m.*x-y).^2.*(xq-x)+(z-zd).^2.*(m.^2.*(x-xq)+2*m.*(c-y+m.*x));
 D = (z-zd).*(-(c-y).^2+2*m.*(xq-2*x).*(c-y)+m.^2.*x.*(-3*x+2*xq)+m.^2.*(z-zd).^2);
 R = c.*m-x+xq+m.^2.*xq-m.*y+sqrtm.*S;
-myBx = (2*[-1,1,1,-1].*m(m~=0)./sqrtm(m~=0).*log(R(m~=0))-[1,1,-1,-1].*log((C(m~=0).^2+D(m~=0).^2)./(M(m~=0).^2+N(m~=0).^2)));
+myBx = (2*(-1).^(pmn0+qmn0+1).*reshape(m(mn0)./sqrtm(mn0).*log(R(mn0)),size(m,1),[])+(-1).^(qmn0).*reshape(log((C(mn0).^2+D(mn0).^2)./(M(mn0).^2+N(mn0).^2)),size(m,1),[])); % m ~= 0
 % myBx = 2*[m(:,1)/sqrtm(:,1)*log(R(:,3)./R(:,1)),m(:,3)/sqrtm(:,3)*log(R(:,2)./R(:,4))]+log(((M(:,1:2).^2+N(:,1:2).^2).*(C(:,3:4).^2+D(:,3:4).^2))./((C(:,1:2).^2+D(:,1:2).^2).*(M(:,3:4).^2+N(:,3:4).^2)));
-myBx(ymxc) = 0;
-myBx(m==0) = [1,-1,-1,1].*log((c(m==0)-y(m==0)+S(m==0))./(y(m==0)-c(m==0)+S(m==0)));
+% myBx(ymxc) = 0;
+myBx = [myBx,(-1).^(pm0+qm0).*reshape(log((c(m0)-y(m0)+S(m0))./(y(m0)-c(m0)+S(m0))),size(m,1),[])]; % m == 0
 % myBx(isinf(myBx)) = 0;
+myBx(x==xq) = 0;
 assert(sum(sum(isinf(myBx))) == 0)
 assert(sum(sum(isnan(myBx))) == 0)
 Bx = MdotN/(8*pi)*sum(myBx,2);
 myBy = -[-1,1,1,-1]./sqrtm.*log(-x+xq+m.*(c+m.*xq-y)+sqrtm.*S);
+myBy(y==m.*xq+c) = 0;
+assert(sum(sum(isinf(myBy))) == 0)
+assert(sum(sum(isnan(myBy))) == 0)
 By = MdotN/(4*pi)*sum(myBy,2);
 rr = M.*C+N.*D;
 x1 = rr(:,1:2);

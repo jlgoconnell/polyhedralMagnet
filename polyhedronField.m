@@ -65,6 +65,8 @@ for i = 1:length(Fac)
     
     B = B + [Bxpoly,Bypoly,Bzpoly]*Rn;
     
+%     assert(sum(isnan(B(:)))==0);
+    
 end
 
 end
