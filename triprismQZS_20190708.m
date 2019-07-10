@@ -39,7 +39,7 @@ magnitudefixed = {magnitude1,magnitude2,magnitude3,magnitude4};
 % magnetfixed = {magnet2};
 % magnitudefixed = {magnitude2};
 
-[F,T,t] = polyhedronForce(magnetfixed,magnetfloat,magnitudefixed,magnitudefloat,32,mean(magnetfloat),d);
+[F,T,t] = polyhedronForce(magnetfixed,magnetfloat,magnitudefixed,magnitudefloat,16,mean(magnetfloat),d);
 
 mf = alphaShape(magnetfloat,inf);
 figure;
