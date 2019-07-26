@@ -30,95 +30,60 @@ y = obspt(:,2);
 z = obspt(:,3);
 zd = vertices(1,3);
 
+p = [1,2,1,2];
+q = [1,1,2,2];
+m = repmat(m,1,2);
+c = repmat(c,1,2);
+xq = [x1,x1,x2,x2];
 
-tic;
-p = [1,2];
-
-mn0 = m(m~=0);
-cn0 = c(m~=0);
-p = p(m~=0);
-sqrtm = sqrt(1+mn0.^2);
-
-S1 = sqrt((x-x1).^2+(y-mn0.*x1-cn0).^2+(z-zd).^2);
-R1 = cn0.*mn0-x+x1+mn0.^2.*x1-mn0.*y+sqrtm.*S1;
-I = [1,-1];
-negS1 = S1.*I(m~=0);
-M1 = (z-zd).^2.*(mn0.*(mn0.*x1+cn0-y)+x1-x+mn0.*negS1);
-N1 = -(z-zd).*((cn0+mn0.*x-y).*(cn0+negS1+mn0.*x1-y)+(z-zd).^2);
-C1 = (cn0+mn0.*x-y).^2.*(x1-x)+(z-zd).^2.*(mn0.^2.*(x-x1)+2*mn0.*(cn0-y+mn0.*x));
-D1 = (z-zd).*(-(cn0-y).^2+2*mn0.*(x1-2*x).*(cn0-y)+mn0.^2.*x.*(-3*x+2*x1)+mn0.^2.*(z-zd).^2);
-S2 = sqrt((x-x2).^2+(y-mn0.*x2-cn0).^2+(z-zd).^2);
-R2 = cn0.*mn0-x+x2+mn0.^2.*x2-mn0.*y+sqrtm.*S2;
-negS2 = S2.*I(m~=0);
-M2 = (z-zd).^2.*(mn0.*(mn0.*x2+cn0-y)+x2-x+mn0.*negS2);
-N2 = -(z-zd).*((cn0+mn0.*x-y).*(cn0+negS2+mn0.*x2-y)+(z-zd).^2);
-C2 = (cn0+mn0.*x-y).^2.*(x2-x)+(z-zd).^2.*(mn0.^2.*(x-x2)+2*mn0.*(cn0-y+mn0.*x));
-D2 = (z-zd).*(-(cn0-y).^2+2*mn0.*(x2-2*x).*(cn0-y)+mn0.^2.*x.*(-3*x+2*x2)+mn0.^2.*(z-zd).^2);
-
-myBx = zeros(length(x),2);
-myBx(:,m~=0) = 2*(-1).^p.*mn0./sqrtm.*log(R1./R2) + log((M1.^2+N1.^2).*(C2.^2+D2.^2)./((C1.^2+D1.^2).*(M2.^2+N2.^2)));
-toc;
-
-
-
-
-
-xq = [vertices(1,1),vertices(1,1),vertices(3,1),vertices(3,1)];
-m = [m,m];
-c = [c,c];
-
-
-[x,m] = meshgrid(x,m);
-[y,c] = meshgrid(y,c);
-[z,xq] = meshgrid(z,xq);
-x = x';
-y = y';
-z = z';
-m = m';
-c = c';
-xq = xq';
-
-p = repmat([1,2],size(m,1),2);
-q = repelem([1,2],size(m,1),2);
-mn0 = m~=0;
-m0 = m==0;
-pmn0 = reshape(p(mn0),size(m,1),[]);
-qmn0 = reshape(q(mn0),size(m,1),[]);
-pm0 = reshape(p(m0),size(m,1),[]);
-qm0 = reshape(q(m0),size(m,1),[]);
-
-% ymxc = y==m.*xq+c; % An edge case that occurs sometimes
 S = sqrt((x-xq).^2+(y-m.*xq-c).^2+(z-zd).^2);
-negS = S.*[1,-1,1,-1];
-M = (z-zd).^2.*(m.*(m.*xq+c-y)+xq-x+m.*negS);
-N = -(z-zd).*((c+m.*x-y).*(c+negS+m.*xq-y)+(z-zd).^2);
-C = (c+m.*x-y).^2.*(xq-x)+(z-zd).^2.*(m.^2.*(x-xq)+2*m.*(c-y+m.*x));
-D = (z-zd).*(-(c-y).^2+2*m.*(xq-2*x).*(c-y)+m.^2.*x.*(-3*x+2*xq)+m.^2.*(z-zd).^2);
-R = c.*m-x+xq+m.^2.*xq-m.*y+sqrtm.*S;
-myBx = (2*(-1).^(pmn0+qmn0+1).*reshape(m(mn0)./sqrtm(mn0).*log(R(mn0)),size(m,1),[])+(-1).^(qmn0).*reshape(log((C(mn0).^2+D(mn0).^2)./(M(mn0).^2+N(mn0).^2)),size(m,1),[])); % m ~= 0
-% myBx = 2*[m(:,1)/sqrtm(:,1)*log(R(:,3)./R(:,1)),m(:,3)/sqrtm(:,3)*log(R(:,2)./R(:,4))]+log(((M(:,1:2).^2+N(:,1:2).^2).*(C(:,3:4).^2+D(:,3:4).^2))./((C(:,1:2).^2+D(:,1:2).^2).*(M(:,3:4).^2+N(:,3:4).^2)));
-% myBx(ymxc) = 0;
-myBx = [myBx,(-1).^(pm0+qm0).*reshape(log((c(m0)-y(m0)+S(m0))./(y(m0)-c(m0)+S(m0))),size(m,1),[])]; % m == 0
-% myBx(isinf(myBx)) = 0;
-myBx(x==xq) = 0;
-assert(sum(sum(isinf(myBx))) == 0)
-assert(sum(sum(isnan(myBx))) == 0)
-Bx = MdotN/(8*pi)*sum(myBx,2);
-myBy = -[-1,1,1,-1]./sqrtm.*log(-x+xq+m.*(c+m.*xq-y)+sqrtm.*S);
-myBy(y==m.*xq+c) = 0;
-assert(sum(sum(isinf(myBy))) == 0)
-assert(sum(sum(isnan(myBy))) == 0)
+C = (xq-x).*(c+m.*x-y).^2+2*m.*(z-zd).^2.*(c+m.*x-y)-m.^2.*(z-zd).^2.*(xq-x);
+D = -(z-zd).*((c+m.*x-y).*(c+m.*x-y-2*m.*(xq-x))-m.^2.*(z-zd).^2);
+M = (c+m.*x-y).*(c-(-1).^p.*S+m.*xq-y)+(z-zd).^2;
+N = (xq-x+m.*(c-(-1).^p.*S+m.*xq-y)).*(z-zd);
+R = xq-x+m.*(c+m.*xq-y)+sqrt(1+m.^2).*S;
+
+indxz = (x==xq)&(z==zd);
+indxz = (abs(x-xq)<0.0001)&(abs(z-zd)<0.0001);
+NUM = fliplr(c+m.*xq-y-abs(c+m.*xq-y))./abs(c+m.*xq-y)-(c+m.*xq-y+abs(m.*xq+c-y))./fliplr(abs(m.*xq+c-y));
+DEN = 2*(c+m.*xq-y).*fliplr(c+m.*xq-y);
+% NUM = (c(2)+m(2)*xq-y-abs(c(2)+m(2)*xq-y))./abs(c(1)+m(1)*xq-y)-(c(1)+m(1)*xq-y+abs(m(1)*xq+c(1)-y))./abs(m(2)*xq+c(2)-y);
+% DEN = 2*(c(1)+m(1)*xq-y).*(c(2)+m(2)*xq-y);
+M(indxz) = [sum(NUM(indxz),2),ones(length(NUM(indxz)),1)];
+C(indxz) = [sum(DEN(indxz),2),ones(length(NUM(indxz)),1)];
+% M(indxz) = [NUM(sum(indxz,2)~=0),ones(size(NUM(sum(indxz,2)~=0)))];
+% C(indxz) = [DEN(sum(indxz,2)~=0),ones(size(DEN(sum(indxz,2)~=0)))];
+
+
+% myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./((xq-x).^2+(z-zd).^2));
+myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
+myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(R);
+myBz = (-1).^(q).*atan2((M.*C+N.*D),(N.*C-M.*D));
+
+Bx = -MdotN/(8*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
-rr = M.*C+N.*D;
-x1 = rr(:,1:2);
-x2 = rr(:,3:4);
-rr = N.*C-M.*D;
-y1 = rr(:,1:2);
-y2 = rr(:,3:4);
-myBz = -atan2(y1.*x2-y2.*x1,x1.*x2+y1.*y2);
-Bz = MdotN/(4*pi)*(sum(myBz,2));
+Bz = -MdotN/(4*pi)*sum(wrapToPi(myBz(:,1:2)+myBz(:,3:4)),2);
 
 B = [Bx,By,Bz];
+
+% Some bugtesting variables:
+Y = m.*x+c-y;
+Ys = m.*xq+c-y-(-1).^p.*S;
+Z = z-zd;
+X = xq-x;
+A = (-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
+
+% assert(sum(isnan(B(:)))==0)
+% B(isnan(B)) = 0;
+
+Y1 = Y(:,1);
+Y2 = Y(:,2);
+Ys11 = Ys(:,1);
+Ys21 = Ys(:,2);
+X1 = X(:,1);
+
+% NUM = (c(2)+m(2)*x-y-abs(c(2)+m(2)*x-y))./abs(c(1)+m(1)*x-y)-(c(1)+m(1)*x-y+abs(m(1)*x+c(1)-y))./abs(m(2)*x+c(2)-y);
+% DEN = 2*(c(1)+m(1)*x-y).*(c(2)+m(2)*x-y);
 
 end
 
