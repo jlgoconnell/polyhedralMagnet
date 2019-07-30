@@ -30,12 +30,14 @@ y = obspt(:,2);
 z = obspt(:,3);
 zd = vertices(1,3);
 
+% Set up some indexing stuff
 p = [1,2,1,2];
 q = [1,1,2,2];
 m = repmat(m,1,2);
 c = repmat(c,1,2);
 xq = [x1,x1,x2,x2];
 
+% Set up intermediate variables
 S = sqrt((x-xq).^2+(y-m.*xq-c).^2+(z-zd).^2);
 C = (xq-x).*(c+m.*x-y).^2+2*m.*(z-zd).^2.*(c+m.*x-y)-m.^2.*(z-zd).^2.*(xq-x);
 D = -(z-zd).*((c+m.*x-y).*(c+m.*x-y-2*m.*(xq-x))-m.^2.*(z-zd).^2);
@@ -43,19 +45,28 @@ M = (c+m.*x-y).*(c-(-1).^p.*S+m.*xq-y)+(z-zd).^2;
 N = (xq-x+m.*(c-(-1).^p.*S+m.*xq-y)).*(z-zd);
 R = xq-x+m.*(c+m.*xq-y)+sqrt(1+m.^2).*S;
 
-indxz = (x==xq)&(z==zd);
-indxz = (abs(x-xq)<0.0001)&(abs(z-zd)<0.0001);
-NUM = fliplr(c+m.*xq-y-abs(c+m.*xq-y))./abs(c+m.*xq-y)-(c+m.*xq-y+abs(m.*xq+c-y))./fliplr(abs(m.*xq+c-y));
-DEN = 2*(c+m.*xq-y).*fliplr(c+m.*xq-y);
-% NUM = (c(2)+m(2)*xq-y-abs(c(2)+m(2)*xq-y))./abs(c(1)+m(1)*xq-y)-(c(1)+m(1)*xq-y+abs(m(1)*xq+c(1)-y))./abs(m(2)*xq+c(2)-y);
-% DEN = 2*(c(1)+m(1)*xq-y).*(c(2)+m(2)*xq-y);
-M(indxz) = [sum(NUM(indxz),2),ones(length(NUM(indxz)),1)];
-C(indxz) = [sum(DEN(indxz),2),ones(length(NUM(indxz)),1)];
-% M(indxz) = [NUM(sum(indxz,2)~=0),ones(size(NUM(sum(indxz,2)~=0)))];
-% C(indxz) = [DEN(sum(indxz,2)~=0),ones(size(DEN(sum(indxz,2)~=0)))];
+% Modify intermediate variables for singular cases
+indxz = (abs(x-xq)<eps)&(abs(z-zd)<eps);
+NUM = [(c(2)+m(2)*x-y-abs(c(2)+m(2)*x-y))./abs(c(1)+m(1)*x-y)-(c(1)+m(1)*x-y+abs(m(1)*x+c(1)-y))./abs(m(2)*x+c(2)-y),ones(size(x))];
+DEN = [2*(c(1)+m(1)*x-y).*(c(2)+m(2)*x-y),ones(size(x))];
+NUM = [NUM,NUM];
+DEN = [DEN,DEN];
+M(indxz) = NUM(indxz);
+C(indxz) = DEN(indxz);
 
+indyz = (abs(y-m.*x-c)<eps)&(abs(z-zd)<eps);
+NUM = ones(size(indyz));
+DEN = ones(size(indyz));
+M(indyz) = NUM(indyz);
+C(indyz) = DEN(indyz);
 
-% myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./((xq-x).^2+(z-zd).^2));
+indR = abs(R)<eps;
+xx = x.*indR;
+mm = m.*indR;
+xqq = xq.*indR;
+R(indR) = (sqrt(1+mm(indR).^2)-mm(indR).^2)./((xx(indR)-xqq(indR)).*sqrt(1+mm(indR).^2));
+
+% Solve the equations
 myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(R);
 myBz = (-1).^(q).*atan2((M.*C+N.*D),(N.*C-M.*D));
@@ -65,25 +76,6 @@ By = MdotN/(4*pi)*sum(myBy,2);
 Bz = -MdotN/(4*pi)*sum(wrapToPi(myBz(:,1:2)+myBz(:,3:4)),2);
 
 B = [Bx,By,Bz];
-
-% Some bugtesting variables:
-Y = m.*x+c-y;
-Ys = m.*xq+c-y-(-1).^p.*S;
-Z = z-zd;
-X = xq-x;
-A = (-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
-
-% assert(sum(isnan(B(:)))==0)
-% B(isnan(B)) = 0;
-
-Y1 = Y(:,1);
-Y2 = Y(:,2);
-Ys11 = Ys(:,1);
-Ys21 = Ys(:,2);
-X1 = X(:,1);
-
-% NUM = (c(2)+m(2)*x-y-abs(c(2)+m(2)*x-y))./abs(c(1)+m(1)*x-y)-(c(1)+m(1)*x-y+abs(m(1)*x+c(1)-y))./abs(m(2)*x+c(2)-y);
-% DEN = 2*(c(1)+m(1)*x-y).*(c(2)+m(2)*x-y);
 
 end
 
