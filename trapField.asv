@@ -67,12 +67,13 @@ DEN = [DEN,DEN];
 M(indxz) = NUM(indxz);
 C(indxz) = DEN(indxz);
 YY = m.*x+c-y;
-num = 2*sign(YY).^p;
-den = (-1).^(p+1).*YY-abs(YY)+fliplr(YY)+(-1).^(p+1).*abs(fliplr(YY));
+num = 2+zeros(size(indxz));%2*sign(YY).^p;
+dentemp = (-1).^(p+1).*YY-abs(YY)+fliplr(YY)+(-1).^(p+1).*abs(fliplr(YY));
+den = YY(indxz) - abs(YY(indxz)) + fliplr(YY(indxz)) + abs(fliplr(YY(indxz)));
 MM = M;
 CC = C;
-MM(indxz) = num(indxz);
-CC(indxz) = den(indxz);
+M(indxz) = num(indxz);
+C(indxz) = den(indxz);
 
 indyz = (abs(y-m.*x-c)<eps)&(abs(z-zd)<eps);
 NUM = ones(size(indyz));
@@ -87,7 +88,10 @@ xqq = xq.*indR;
 R(indR) = (sqrt(1+mm(indR).^2)-mm(indR).^2)./((xx(indR)-xqq(indR)).*sqrt(1+mm(indR).^2));
 
 indmy = (abs(y-c)<eps)&(abs(m)<eps);
-C(indmy) = (xqq-xx).^2+
+zz = repmat(z,1,4);
+% C(indmy) = (xqq(indmy)-xx(indmy)).^2+(zz(indmy)-zd).^2;
+C(indmy) = S(indmy);
+D(indmy) = 0;
 
 % Solve the equations
 myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
