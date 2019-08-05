@@ -33,8 +33,8 @@ magnitude4 = magnitude3;
 magnetfixed = {magnet1,magnet2,magnet3,magnet4};
 magnitudefixed = {magnitude1,magnitude2,magnitude3,magnitude4};
 
-magnetfixed = {magnet1,magnet2};
-magnitudefixed = {magnitude1,magnitude2};
+% magnetfixed = {magnet1,magnet2};
+% magnitudefixed = {magnitude1,magnitude2};
 % 
 % magnetfixed = {magnet2};
 % magnitudefixed = {magnitude2};

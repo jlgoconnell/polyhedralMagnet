@@ -46,6 +46,19 @@ N = (xq-x+m.*(c-(-1).^p.*S+m.*xq-y)).*(z-zd);
 R = xq-x+m.*(c+m.*xq-y)+sqrt(1+m.^2).*S;
 
 % Modify intermediate variables for singular cases
+% indm = repmat(m,size(x))==0;
+% mm = m.*indm;
+% cc = c.*indm;
+% yy = y.*indm;
+% xx = x.*indm;
+% zz = z.*indm;
+% xqq = xq.*indm;
+% R(indm) = (S(indm)+cc(indm)-yy(indm))./sqrt((xqq(indm)-xx(indm)).^2+(zz(indm)-zd).^2);
+% M(indm) = 1;
+% N(indm) = 0;
+% C(indm) = 1;
+% D(indm) = 0;
+
 indxz = (abs(x-xq)<eps)&(abs(z-zd)<eps);
 NUM = [(c(2)+m(2)*x-y-abs(c(2)+m(2)*x-y))./abs(c(1)+m(1)*x-y)-(c(1)+m(1)*x-y+abs(m(1)*x+c(1)-y))./abs(m(2)*x+c(2)-y),ones(size(x))];
 DEN = [2*(c(1)+m(1)*x-y).*(c(2)+m(2)*x-y),ones(size(x))];
@@ -53,6 +66,13 @@ NUM = [NUM,NUM];
 DEN = [DEN,DEN];
 M(indxz) = NUM(indxz);
 C(indxz) = DEN(indxz);
+YY = m.*x+c-y;
+num = 2+zeros(size(indxz));%2*sign(YY).^p;
+den = (-1).^(p+1).*YY-abs(YY)+fliplr(YY)+(-1).^(p+1).*abs(fliplr(YY));
+MM = M;
+CC = C;
+M(indxz) = num(indxz);
+C(indxz) = den(indxz);
 
 indyz = (abs(y-m.*x-c)<eps)&(abs(z-zd)<eps);
 NUM = ones(size(indyz));
@@ -65,6 +85,12 @@ xx = x.*indR;
 mm = m.*indR;
 xqq = xq.*indR;
 R(indR) = (sqrt(1+mm(indR).^2)-mm(indR).^2)./((xx(indR)-xqq(indR)).*sqrt(1+mm(indR).^2));
+
+indmy = (abs(y-c)<eps)&(abs(m)<eps);
+zz = repmat(z,1,4);
+% C(indmy) = (xqq(indmy)-xx(indmy)).^2+(zz(indmy)-zd).^2;
+C(indmy) = S(indmy);
+D(indmy) = 0;
 
 % Solve the equations
 myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
