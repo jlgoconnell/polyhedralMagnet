@@ -15,6 +15,7 @@ magnitudefloat = [0,0,1];
 n = 201;
 d = [zeros(n+2,2),linspace(-0.01,0.01,n+2)'];
 d = d(2:end-1,:);
+% d = 0;
 
 b = sqrt(3)*0.02;
 b = 0.02;
@@ -39,7 +40,7 @@ magnitudefixed = {magnitude1,magnitude2,magnitude3,magnitude4};
 % magnetfixed = {magnet2};
 % magnitudefixed = {magnitude2};
 
-[F,T,t] = polyhedronForce(magnetfixed,magnetfloat,magnitudefixed,magnitudefloat,8,mean(magnetfloat),d);
+[F,T,t] = polyhedronForce(magnetfixed,magnetfloat,magnitudefixed,magnitudefloat,1,mean(magnetfloat),d);
 
 mf = alphaShape(magnetfloat,inf);
 figure;
@@ -51,4 +52,4 @@ for i = 1:length(magnetfixed)
 end
 
 figure;
-plot(d(:,3),F(:,3));
+plot(d(:,3),F(:,:));
