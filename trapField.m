@@ -45,43 +45,56 @@ M = (c+m.*x-y).*(c-(-1).^p.*S+m.*xq-y)+(z-zd).^2;
 N = (xq-x+m.*(c-(-1).^p.*S+m.*xq-y)).*(z-zd);
 R = xq-x+m.*(c+m.*xq-y)+sqrt(1+m.^2).*S;
 
-% Solve singularities:
-indxz = (abs(x-xq)<eps)&(abs(z-zd)<eps);
-YY = m.*x+c-y;
-num = 2+zeros(size(indxz));
-den = (-1).^(p+1).*YY-abs(YY)+fliplr(YY)+(-1).^(p+1).*abs(fliplr(YY));
-M(indxz) = num(indxz);
-N(indxz) = 0;
-C(indxz) = den(indxz);
-D(indxz) = 0;
-
-indyz = (abs(y-m.*x-c)<eps)&(abs(z-zd)<eps);
-NUM = ones(size(indyz));
-DEN = ones(size(indyz));
-M(indyz) = NUM(indyz);
-N(indyz) = 0;
-C(indyz) = 0;
-D(indyz) = DEN(indyz);
-
+% % Solve singularities:
+% indxz = (abs(x-xq)<eps)&(abs(z-zd)<eps);
+% YY = m.*x+c-y;
+% num = 2+zeros(size(indxz));
+% den = (-1).^(p+1).*YY-abs(YY)+fliplr(YY)+(-1).^(p+1).*abs(fliplr(YY));
+% M(indxz) = num(indxz);
+% N(indxz) = 0;
+% C(indxz) = den(indxz);
+% D(indxz) = 0;
+% 
+% indyz = (abs(y-m.*x-c)<eps)&(abs(z-zd)<eps);
+% NUM = ones(size(indyz));
+% DEN = ones(size(indyz));
+% M(indyz) = NUM(indyz);
+% N(indyz) = 0;
+% C(indyz) = 0;
+% D(indyz) = DEN(indyz);
+% 
 indR = abs(R)<eps;
 xx = x.*indR;
 mm = m.*indR;
 xqq = xq.*indR;
 R(indR) = (sqrt(1+mm(indR).^2)-mm(indR).^2)./((xx(indR)-xqq(indR)).*sqrt(1+mm(indR).^2));
+% 
+% indmy = (abs(y-c)<eps)&(abs(m)<eps);
+% zz = repmat(z,1,4);
+% C(indmy) = S(indmy);
+% D(indmy) = 0;
 
-indmy = (abs(y-c)<eps)&(abs(m)<eps);
-zz = repmat(z,1,4);
-C(indmy) = S(indmy);
-D(indmy) = 0;
+% Debugging variables:
+Y = c+m.*x-y;
+Yq = c+m.*xq-y;
+X = xq-x;
+Z = zd-z;
+Sp = (-1).^p.*S;
 
 % Solve the equations
 myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(R);
-myBz = (-1).^(q).*atan2((M.*C+N.*D),(N.*C-M.*D));
+myBz = (-1).^(q).*atan2((z-zd).*(M.*C+N.*D),(z-zd).*(N.*C-M.*D));
 
-Bx = -MdotN/(8*pi)*sum(myBx,2);
+% Massive simplification to the x-field equation:
+% Note that this breaks if z-zd = 0 and x-xq = 0.
+myBx = (-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^(p+q).*log(S-c-m.*xq+y);
+
+Bx = -MdotN/(4*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
 Bz = -MdotN/(4*pi)*sum(wrapToPi(myBz(:,1:2)+myBz(:,3:4)),2);
+% Bz = -MdotN/(4*pi)*sum(mod(myBz(:,1:2)+myBz(:,3:4)+pi,2*pi)-pi,2);
+Bz = -MdotN/(4*pi)*sum(myBz,2);
 
 B = [Bx,By,Bz];
 
