@@ -117,10 +117,22 @@ Y = c+m.*x-y;
 Z = zd-z;
 S = sqrt(X.^2+(Y+m.*X).^2+Z.^2);
 R = X.*(1+m.^2)+m.*Y+sqrt(1+m.^2).*S;
+T = S-Y-m.*X;
 
-myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(R)+log(S-Y-m.*X));
+% Singularity treatment:
+
+% If R = 0:
+indR = (abs(Z)<eps) & (abs(Y)<eps) & (X<0);
+R(indR) = 1./X(indR);
+
+% If T = 0:
+indT = (abs(Z)<eps) & (abs(X)<eps) & (Y+m.*X>0);
+mX = m.*X;
+T(indT) = mX(indT)+Y(indT);
+
+myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(R)+log(T));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(R);
-myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*Z.^2),Z.*(Z.*S))+2*(-1).^q.*atan2(m.*Z,Y);
+myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*Z.^2),Z.*(Z.*S));%+2*(-1).^q.*atan2(m.*Z,Y);
 
 Bx = MdotN/(4*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
