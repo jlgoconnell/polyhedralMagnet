@@ -37,102 +37,27 @@ m = repmat(m,1,2);
 c = repmat(c,1,2);
 xq = [x1,x1,x2,x2];
 
-% % Set up intermediate variables
-% S = sqrt((x-xq).^2+(y-m.*xq-c).^2+(z-zd).^2);
-% C = (xq-x).*(c+m.*x-y).^2+2*m.*(z-zd).^2.*(c+m.*x-y)-m.^2.*(z-zd).^2.*(xq-x);
-% D = -(z-zd).*((c+m.*x-y).*(c+m.*x-y-2*m.*(xq-x))-m.^2.*(z-zd).^2);
-% M = (c+m.*x-y).*(c-(-1).^p.*S+m.*xq-y)+(z-zd).^2; % NI
-% N = (xq-x+m.*(c-(-1).^p.*S+m.*xq-y)).*(z-zd); % NR
-% R = xq-x+m.*(c+m.*xq-y)+sqrt(1+m.^2).*S;
-% 
-% % % Solve singularities:
-% % indxz = (abs(x-xq)<eps)&(abs(z-zd)<eps);
-% % YY = m.*x+c-y;
-% % num = 2+zeros(size(indxz));
-% % den = (-1).^(p+1).*YY-abs(YY)+fliplr(YY)+(-1).^(p+1).*abs(fliplr(YY));
-% % M(indxz) = num(indxz);
-% % N(indxz) = 0;
-% % C(indxz) = den(indxz);
-% % D(indxz) = 0;
-% % 
-% % indyz = (abs(y-m.*x-c)<eps)&(abs(z-zd)<eps);
-% % NUM = ones(size(indyz));
-% % DEN = ones(size(indyz));
-% % M(indyz) = NUM(indyz);
-% % N(indyz) = 0;
-% % C(indyz) = 0;
-% % D(indyz) = DEN(indyz);
-% % 
-% indR = abs(R)<eps;
-% indRc = sum(indR,2)~=0;
-% indRr = sum(indR,1)~=0;
-% xx = x.*indR;
-% mm = m.*indR;
-% xqq = xq.*indR;
-% R(indR) = (sqrt(1+mm(indR).^2)-mm(indR).^2)./((xx(indR)-xqq(indR)).*sqrt(1+mm(indR).^2));
-% % 
-% % indmy = (abs(y-c)<eps)&(abs(m)<eps);
-% % zz = repmat(z,1,4);
-% % C(indmy) = S(indmy);
-% % D(indmy) = 0;
-% 
-% % Debugging variables:
-% Y = c+m.*x-y;
-% Yq = c+m.*xq-y;
-% X = xq-x;
-% Z = zd-z;
-% Sp = (-1).^p.*S;
-% ni = -(Y.*(S+Yq)+Z.^2).*Z;
-% nr = -(X+m.*(S+Yq)).*Z.^2;
-% di = -Z.*(Y.*(Y-2*m.*X)-m.^2.*Z.^2);
-% dr = X.*Y.^2+2*m.*Z.^2.*Y-m.^2.*X.*Z.^2;
-% 
-% % Solve the equations
-% myBx = 2*(-1).^(p+q).*m./sqrt(1+m.^2).*log(R)+(-1).^q.*log((M.^2+N.^2)./(C.^2+D.^2));
-% myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(R);
-% myBz = (-1).^(q).*atan2((z-zd).*(M.*C+N.*D),(z-zd).*(N.*C-M.*D));
-% 
-% % Massive simplification to the x-field equation:
-% % Note that this breaks if z-zd = 0 and x-xq = 0.
-% myBx = (-1).^(p+q).*(m./sqrt(1+m.^2).*log(R)+log(S-c-m.*xq+y));
-% 
-% Bx = -MdotN/(4*pi)*sum(myBx,2);
-% By = MdotN/(4*pi)*sum(myBy,2);
-% Bz = -MdotN/(4*pi)*sum(wrapToPi(myBz(:,1:2)+myBz(:,3:4)),2);
-% % Bz = -MdotN/(4*pi)*sum(mod(myBz(:,1:2)+myBz(:,3:4)+pi,2*pi)-pi,2);
-% Bz = -MdotN/(4*pi)*sum(myBz,2);
-% 
-% B = [Bx,By,Bz];
-% 
-% % More debugging variables:
-% MM = Z.^2.*(X+m.*(S+Yq));
-% NN = -Z.*(Y.*(S+Yq)+Z.^2);
-% CC = X.*Y.^2+2*m.*Y.*Z.^2-m.^2.*X.*Z.^2;
-% DD = Z.*(m.^2.*Z.^2-Y.^2+2*m.*X.*Y);
-% 
-% newBz = (-1).^(p+q).*atan2(Z.*(X.*Y-m.*Z.^2),Z.*(Z.*S))-2*(-1).^q.*atan2(m.*Z,Y);
-
+% Set up intermediate variables
 X = xq-x;
 Y = c+m.*x-y;
 Z = zd-z;
-S = sqrt(X.^2+(Y+m.*X).^2+Z.^2);
-R = X.*(1+m.^2)+m.*Y+sqrt(1+m.^2).*S;
-T = S-Y-m.*X;
+R = sqrt(X.^2+(Y+m.*X).^2+Z.^2);
+S = X.*(1+m.^2)+m.*Y+sqrt(1+m.^2).*R;
+T = R-Y-m.*X;
 
 % Singularity treatment:
 
-% If R = 0:
-indR = (abs(Z)<eps) & (abs(Y)<eps) & (X<0);
-R(indR) = 1./X(indR);
+% If S = 0:
+indS = (abs(Z)<eps) & (abs(Y)<eps) & (X<=0);
+S(indS) = 1./X(indS);
 
 % If T = 0:
-indT = (abs(Z)<eps) & (abs(X)<eps) & (Y+m.*X>0);
-mX = m.*X;
-T(indT) = mX(indT)+Y(indT);
+indT = (abs(Z)<eps) & (abs(X)<eps) & (Y>=0);
+T(indT) = 1./Y(indT);
 
-myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(R)+log(T));
-myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(R);
-myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*Z.^2),Z.*(Z.*S));%+2*(-1).^q.*atan2(m.*Z,Y);
+myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(S)+log(T));
+myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
+myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*Z.^2),Z.*(Z.*S));
 
 Bx = MdotN/(4*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
