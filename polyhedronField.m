@@ -35,12 +35,12 @@ for i = 1:length(Fac)
     
     % Rotate the face to be parallel to the XY plane
     n = norms(i,:)/norm(norms(i,:));
-    thetay = atan2(n(1),-n(3));
-    thetax = atan2(n(2),-sqrt(n(1)^2+n(3)^2));
-    Ry = [cos(thetay),0,sin(thetay);0,1,0;-sin(thetay),0,cos(thetay)];
-    Rx = [1,0,0;0,cos(thetax),-sin(thetax);0,sin(thetax),cos(thetax)];
-    Rn = Rx*Ry;
-    R = Rn^-1;
+    m = sqrt(n(2)^2+n(3)^2);
+    sg = sign(n(3));
+    R = [m,            0,          sg*n(1);...
+         -n(1)*n(2)/m, sg*n(3)/m,  sg*n(2);...
+         -n(1)*n(3)/m, -sg*n(2)/m, abs(n(3))];
+    Rn = R';
     facepts = facepts*R;
     thisz = facepts(1,3);
     

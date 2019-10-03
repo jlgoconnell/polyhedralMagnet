@@ -39,16 +39,16 @@ xq = [x1,x1,x2,x2];
 
 % Set up intermediate variables
 X = xq-x;
-Y = c+m.*x-y;
+Y = c+m.*xq-y;
 Z = zd-z;
-R = sqrt(X.^2+(Y+m.*X).^2+Z.^2);
-S = X.*(1+m.^2)+m.*Y+sqrt(1+m.^2).*R;
-T = R-Y-m.*X;
+R = sqrt(X.^2+Y.^2+Z.^2);
+S = X+m.*Y+sqrt(1+m.^2).*R;
+T = R-Y;
 
 % Singularity treatment:
 
 % If S = 0:
-indS = (abs(Z)<eps) & (abs(Y)<eps) & (X<=0);
+indS = (abs(Z)<eps) & (abs(Y-m.*X)<eps) & (X<=0);
 S(indS) = 1./X(indS);
 
 % If T = 0:
@@ -57,7 +57,7 @@ T(indT) = 1./Y(indT);
 
 myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(S)+log(T));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
-myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*Z.^2),Z.*(Z.*S));
+myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*(X.^2+Z.^2)),Z.*(Z.*R));
 
 Bx = MdotN/(4*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
