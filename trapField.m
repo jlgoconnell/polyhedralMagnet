@@ -19,49 +19,49 @@
 function B = trapField(vertices,MdotN,obspt)
 
 % Get point and line information
-xq = [vertices(1,1),vertices(1,1),vertices(3,1),vertices(3,1)];
+x1 = vertices(1,1);
+x2 = vertices(3,1);
 m = [(vertices(3,2)-vertices(1,2))/(vertices(3,1)-vertices(1,1)),...
     (vertices(4,2)-vertices(2,2))/(vertices(4,1)-vertices(2,1))];
-m = [m,m];
 c = [vertices(1,2)-m(1)*vertices(1,1),vertices(2,2)-m(2)*vertices(2,1)];
-c = [c,c];
 
-% Run the equations
 x = obspt(:,1);
 y = obspt(:,2);
 z = obspt(:,3);
 zd = vertices(1,3);
 
-[x,m] = meshgrid(x,m);
-[y,c] = meshgrid(y,c);
-[z,xq] = meshgrid(z,xq);
-x = x';
-y = y';
-z = z';
-m = m';
-c = c';
-xq = xq';
-sqrtm = sqrt(1+m.^2);
+% Set up some indexing stuff
+p = [1,2,1,2];
+q = [1,1,2,2];
+m = repmat(m,1,2);
+c = repmat(c,1,2);
+xq = [x1,x1,x2,x2];
 
-S = sqrt((x-xq).^2+(y-m.*xq-c).^2+(z-zd).^2);
-negS = S.*[1,-1,1,-1];
-M = (z-zd).^2.*(m.*(m.*xq+c-y)+xq-x+m.*negS);
-N = -(z-zd).*((c+m.*x-y).*(c+negS+m.*xq-y)+(z-zd).^2);
-C = (c+m.*x-y).^2.*(xq-x)+(z-zd).^2.*(m.^2.*(x-xq)+2*m.*(c-y+m.*x));
-D = (z-zd).*(-(c-y).^2+2*m.*(xq-2*x).*(c-y)+m.^2.*x.*(-3*x+2*xq)+m.^2.*(z-zd).^2);
-R = c.*m-x+xq+m.^2.*xq-m.*y+sqrtm.*S;
-myBx = (2*[-1,1,1,-1].*m./sqrtm.*log(R)+[1,1,-1,-1].*log((M.^2+N.^2)./(C.^2+D.^2)));
-Bx = MdotN/(8*pi)*sum(myBx,2);
-myBy = -[-1,1,1,-1]./sqrtm.*log(-x+xq+m.*(c+m.*xq-y)+sqrtm.*S);
+% Set up intermediate variables
+X = xq-x;
+Y = c+m.*xq-y;
+Z = zd-z;
+R = sqrt(X.^2+Y.^2+Z.^2);
+S = X+m.*Y+sqrt(1+m.^2).*R;
+T = R-Y;
+
+% Singularity treatment:
+
+% If S = 0:
+indS = (abs(Z)<eps) & (abs(Y-m.*X)<eps) & (X<=0);
+S(indS) = 1./X(indS);
+
+% If T = 0:
+indT = (abs(Z)<eps) & (abs(X)<eps) & (Y>=0);
+T(indT) = 1./Y(indT);
+
+myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(S)+log(T));
+myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
+myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*(X.^2+Z.^2)),Z.*(Z.*R));
+
+Bx = MdotN/(4*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
-rr = M.*C+N.*D;
-x1 = rr(:,1:2);
-x2 = rr(:,3:4);
-rr = N.*C-M.*D;
-y1 = rr(:,1:2);
-y2 = rr(:,3:4);
-myBz = -atan2(y1.*x2-y2.*x1,x1.*x2+y1.*y2);
-Bz = MdotN/(4*pi)*(sum(myBz,2));
+Bz = MdotN/(4*pi)*sum(myBz,2);
 
 B = [Bx,By,Bz];
 

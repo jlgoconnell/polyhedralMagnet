@@ -14,12 +14,14 @@
 %
 % James O'Connell 20th Feb 2019.
 
-function B = polyhedronField(vertices, mag, obspt)
+function B = polyhedronField(vertices, mag, obspt, Fac, varargin)
 
 B = zeros(size(obspt));
 
-% Get face and vertex information of the polyhedron using Geom3D
-Fac = minConvexHull(vertices);
+% Get face and vertex information of the polyhedron
+if nargin < 4
+    Fac = minConvexHull(vertices);
+end
 [Ver,~] = surfToMesh(vertices(:,1),vertices(:,2),vertices(:,3));
 norms = meshFaceNormals(Ver,Fac);
 MdotN = 1/(pi*4e-7)*dot(repmat(mag,size(norms,1),1)',norms')';
@@ -33,36 +35,18 @@ for i = 1:length(Fac)
     
     % Rotate the face to be parallel to the XY plane
     n = norms(i,:)/norm(norms(i,:));
-    thetay = atan2(n(1),-n(3));
-    thetax = atan2(n(2),-sqrt(n(1)^2+n(3)^2));
-    Ry = [cos(thetay),0,sin(thetay);0,1,0;-sin(thetay),0,cos(thetay)];
-    Rx = [1,0,0;0,cos(thetax),-sin(thetax);0,sin(thetax),cos(thetax)];
-    Rn = Rx*Ry;
-    R = Rn^-1;
+    m = sqrt(n(2)^2+n(3)^2);
+    sg = sign(n(3));
+    R = [m,            0,          sg*n(1);...
+         -n(1)*n(2)/m, sg*n(3)/m,  sg*n(2);...
+         -n(1)*n(3)/m, -sg*n(2)/m, abs(n(3))];
+    Rn = R';
     facepts = facepts*R;
     thisz = facepts(1,3);
     
     % Decompose into trapezia
-    facepts(end+1,:) = facepts(1,:);
-    trappts = facepts;
-    for j = 1:length(facepts)-1
-        for k = 1:length(facepts)
-            if (facepts(k,1)-facepts(j,1))*(facepts(k,1)-facepts(j+1,1)) < -1*eps
-                m = (facepts(j+1,2)-facepts(j,2))/(facepts(j+1,1)-facepts(j,1));
-                c = facepts(j,2)-m*facepts(j,1);
-                trappts = [trappts;facepts(k,1),m*facepts(k,1)+c,thisz];
-            end
-        end
-    end
-    trappts = sortrows(trappts);
-    trappts = uniquetol(trappts,'ByRows',true);
-    traplength = length(trappts);
-    for j = 1:traplength
-        if sum(abs(trappts(j,1)-trappts(:,1))<eps) == 1
-            trappts = [trappts;trappts(j,:)];
-        end
-    end
-    trappts = sortrows(trappts);
+    trappts = trapDecomp(facepts(:,1:2));
+    trappts = [trappts, facepts(1,3)*ones(length(trappts),1)];
     
     % Now calculate field of each trapezium
     Bxpoly = zeros(size(obspt,1),1);
@@ -80,6 +64,8 @@ for i = 1:length(Fac)
     end
     
     B = B + [Bxpoly,Bypoly,Bzpoly]*Rn;
+    
+%     assert(sum(isnan(B(:)))==0);
     
 end
 

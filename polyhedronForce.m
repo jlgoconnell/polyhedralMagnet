@@ -1,83 +1,63 @@
 
-% Function to estimate the force and torque between two polyhedral
-% permanent magnets, both with constant uniform magnetisation. Let one
-% magnet be magnet A and the other be magnet B. This function calculates
-% the force and torque on magnet B.
-%
-% Inputs:
-% verticesA: The vertices of one magnet in an (n x 3) matrix.
-% verticesB: The vertices of the magnet we are calculating the force and
-% torque on in an (n x 3) matrix.
-% magA: The magnetisation vector of magnet A in Teslas.
-% magB: The magnetisation vector of magnet B in Teslas.
-% torquepoint: The point about which the torque on magnet B is calculated.
-% tolerance: The maximum difference between the torque and force before
-% convergence is reached.
-% timeout: The maximum time this function is allowed to run for. After
-% this, the function will finish the current iteration then return the
-% results for the current iteration.
-%
-% Outputs:
-% F: A vector representing the x, y, and z forces on magnet B.
-% T: A vector representing the x, y, and z torques on magnet B.
 
-function [F,T] = polyhedronForce(verticesA,verticesB,magA,magB,torquepoint,tolerance,timeout,varargin)
 
-% If missing arguments:
-if nargin < 7
-    timeout = Inf;
-end
-if nargin < 6
-    tolerance = 1e-2;
-end
-if nargin < 5
-    torquepoint = mean(verticesB);
-end
+function [F,T,t] = polyhedronForce(verticesA,verticesB,magA,magB,meshnum,torquept,d,varargin)
 
 tic;
 
-% Initial conditions
-F = [0,0,0];
-T = [0,0,0];
-Fold = 2*[tolerance,tolerance,tolerance];
-Told = Fold;
-
-% Choose a suitable starting mesh parameter
-i = 10;
-
-while max(abs([F,T]-[Fold,Told])) > tolerance && toc < timeout
-    
-    % Temp values to compare error for convergence
-    Fold = F;
-    Told = T;
-    
-    % Set up and subdivide mesh
-    Fac = minConvexHull(verticesB);
-    [Ver,~] = surfToMesh(verticesB(:,1),verticesB(:,2),verticesB(:,3));
-    n = meshFaceNormals(Ver,Fac);
-    MdotN = 1/(pi*4e-7)*dot(repmat(magB,size(n,1),1)',n')';
-    Fac = Fac(abs(MdotN)>eps);
-    [Fac,~] = triangulateFaces(Fac);
-    [Ver,Fac] = subdivideMesh(Ver,Fac,2+i);
-    n = meshFaceNormals(Ver,Fac);
-    
-    % Calculate field
-    MdotN = 1/(pi*4e-7)*dot(repmat(magB,size(n,1),1)',n')';
-    Fac = Fac(abs(MdotN)>1e-8,:);
-    dA = meshFaceAreas(Ver,Fac);
-    obspt = meshFaceCentroids(Ver,Fac);
-    MdotN = MdotN(abs(MdotN)>1e-8,:);
-    B = polyhedronField(verticesA,magA,obspt);
-    
-    % Calculate force and torque
-    F = sum(B.*MdotN.*dA,1);
-    myleverpoint = obspt-torquepoint;
-    T = sum(MdotN.*cross(myleverpoint,B).*dA);
-    
-    i = i + 1;
-    
+if nargin < 7
+    d = [0,0,0];
 end
 
-toc
+f = minConvexHull(verticesB);
+[v,~] = surfToMesh(verticesB(:,1),verticesB(:,2),verticesB(:,3));
+[f,~] = triangulateFaces(f);
+MdotN = meshFaceNormals(v,f)*magB';
+f = f(abs(MdotN)>eps,:);
+if meshnum > 1
+    [v,f] = subdivideMesh(v,f,meshnum);
+end
+
+e = zeros(numel(f), 2);
+for i = 1:length(f)
+    ff = f(i, :);
+    e(3*i-2:3*i, :) = [ff' ff([2:end 1])'];
+end
+[e,~,IE] = unique(sort(e, 2),'rows');
+
+MdotN = meshFaceNormals(v,f)*magB';
+areas = meshFaceAreas(v,f);
+
+midpts = 0.5*(v(e(:,1),:)+v(e(:,2),:));
+fmids = reshape(IE,3,numel(IE)/3)';
+
+% Work out the convex hull of magnet A:
+if iscell(verticesA)
+    for i = 1:length(verticesA)
+        Fac{i} = minConvexHull(verticesA{i});
+    end
+else
+    Fac = minConvexHull(verticesA);
+end
+
+% Loop through all displacements and calculate field, force, and torque:
+for i = 1:size(d,1)
+    midptsd = midpts + repmat(d(i,:),size(midpts,1),1);
+    
+    if iscell(verticesA)
+        Bfield = [0,0,0];
+        for j = 1:length(verticesA)
+            Bfieldtemp = polyhedronField(verticesA{j},magA{j},midptsd,Fac{j});
+            Bfield = Bfield + Bfieldtemp;
+        end
+    else
+        Bfield = polyhedronField(verticesA,magA,midptsd,Fac);
+    end
+
+    F(i,:) = sum(Bfield(fmids',:).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
+    myleverpoint = midptsd(fmids',:)-torquept;
+    T(i,:) = sum(cross(myleverpoint,Bfield(fmids',:)).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
+    t(i) = toc;
+end
 
 end
