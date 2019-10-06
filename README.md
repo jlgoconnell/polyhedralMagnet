@@ -3,6 +3,8 @@ Code to calculate interactions between polyhedral permanent magnets including ma
 
 This code requires the use of the third party Geom2d and Geom3d libraries.
 
+## polyhedronForce.m
+
 polyhedronForce.m semi-analytically calculates the forces and torques on one magnet due to the field of the other.
 
 The input arguments are:
@@ -19,6 +21,8 @@ The output arguments are:
 * T: An (n x 3) matrix describing the calculated torque(s) on magnet B. This has identical dimensions to the input argument d.
 * t: A vector of length n describing the time it took for each force and torque calculation.
 
+## polyhedronField.m
+
 polyhedronField.m analytically calculates the magnetic field at any point(s) due to a polyhedral permanent magnet.
 
 The input arguments are:
@@ -29,6 +33,8 @@ The input arguments are:
 
 The output arguments are:
 * B: An (n x 3) matrix describing the magnetic field strength in Teslas at each point in obspt.
+
+## Other functions
 
 trapField.m analytically calculates the magnetic field due to a magnetically charged trapezium. This function is used in polyhedronField.m and should not be used by itself.
 
