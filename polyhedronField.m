@@ -32,11 +32,12 @@ norms = meshFaceNormals(Ver,Fac);
 for i = 1:length(Fac)
     
     facepts = Ver(Fac{i},:);
+    facepts = round(facepts,8);
     
     % Rotate the face to be parallel to the XY plane
     n = norms(i,:)/norm(norms(i,:));
     m = sqrt(n(2)^2+n(3)^2);
-    sg = sign(n(3));
+    sg = (n(3)>0)*2-1; % sign() function such that sign(0) = 1
     R = [m,            0,          sg*n(1);...
          -n(1)*n(2)/m, sg*n(3)/m,  sg*n(2);...
          -n(1)*n(3)/m, -sg*n(2)/m, abs(n(3))];

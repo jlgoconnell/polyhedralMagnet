@@ -44,6 +44,7 @@ Z = zd-z;
 R = sqrt(X.^2+Y.^2+Z.^2);
 S = X+m.*Y+sqrt(1+m.^2).*R;
 T = R-Y;
+U = (X.*Y-m.*(X.^2+Z.^2))./(Z.*R);
 
 % Singularity treatment:
 
@@ -55,9 +56,13 @@ S(indS) = 1./X(indS);
 indT = (abs(Z)<eps) & (abs(X)<eps) & (Y>=0);
 T(indT) = 1./Y(indT);
 
+% If U = 0/0:
+indU = (abs(Z)<eps) & ((abs(X)<eps) | (abs(Y-m.*X)<eps));
+U(indU) = 0;
+
 myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(S)+log(T));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
-myBz = -(-1).^(p+q).*atan2(Z.*(X.*Y-m.*(X.^2+Z.^2)),Z.*(Z.*R));
+myBz = -(-1).^(p+q).*atan(U);
 
 Bx = MdotN/(4*pi)*sum(myBx,2);
 By = MdotN/(4*pi)*sum(myBy,2);
