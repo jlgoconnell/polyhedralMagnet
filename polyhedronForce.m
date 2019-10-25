@@ -1,4 +1,28 @@
 
+% Function to calculate the magnetic force and torque between two magnets,
+% magnet A and magnet B with magnetisation strengths magA and magB.
+%
+% Inputs:
+% verticesA: An (n x 3) matrix of the vertices of magnet A.
+% verticesB: An (n x 3) matrix of the vertices of magnet B.
+% magA: A (1 x 3) vector describing the magnetisation of magnet A in A/m.
+% magB: A (1 x 3) vector describing the magnetisation of magnet B in A/m.
+% meshnum: A scalar describing how fine the mesh should be on magnet B. A
+% larger number will give a finer mesh, leading to a more accurate but
+% slower calculation. A mesh number between 5 and 10 will usually give a
+% fast and fairly accurate calculation.
+% torquept: A (1 x 3) vector describing the point about which the torque on
+% magnet B should be calculated.
+% d: An (n x 3) matrix of displacement vectors over which the force and
+% torque should be calculated.
+%
+% Output:
+% F: An (n x 3) matrix of the magnetic force on magnet B at each
+% displacement.
+% T: An (n x 3) matrix of the magentic torque on magnet B at each
+% displacement.
+%
+% James O'Connell 20th Feb 2019.
 
 
 function [F,T,t] = polyhedronForce(verticesA,verticesB,magA,magB,meshnum,torquept,d,varargin)
@@ -7,6 +31,10 @@ tic;
 
 if nargin < 7
     d = [0,0,0];
+end
+
+if nargin < 6
+    torquept = mean(verticesB);
 end
 
 f = minConvexHull(verticesB);
@@ -54,9 +82,9 @@ for i = 1:size(d,1)
         Bfield = polyhedronField(verticesA,magA,midptsd,Fac);
     end
 
-    F(i,:) = sum(Bfield(fmids',:).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
+    F(i,:) = sum(Bfield(fmids',:).*repelem(MdotN.*areas,3,1))/3;
     myleverpoint = midptsd(fmids',:)-torquept;
-    T(i,:) = sum(cross(myleverpoint,Bfield(fmids',:)).*repelem(MdotN.*areas,3,1))/(12*pi*10^-7);
+    T(i,:) = sum(cross(myleverpoint,Bfield(fmids',:)).*repelem(MdotN.*areas,3,1))/3;
     t(i) = toc;
 end
 

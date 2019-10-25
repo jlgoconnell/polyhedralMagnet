@@ -18,6 +18,8 @@
 
 function B = trapField(vertices,MdotN,obspt)
 
+mu0MdotN = 4*pi*10^(-7)*MdotN;
+
 % Get point and line information
 x1 = vertices(1,1);
 x2 = vertices(3,1);
@@ -64,9 +66,9 @@ myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(S)+log(T));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
 myBz = -(-1).^(p+q).*atan(U);
 
-Bx = MdotN/(4*pi)*sum(myBx,2);
-By = MdotN/(4*pi)*sum(myBy,2);
-Bz = MdotN/(4*pi)*sum(myBz,2);
+Bx = mu0MdotN/(4*pi)*sum(myBx,2);
+By = mu0MdotN/(4*pi)*sum(myBy,2);
+Bz = mu0MdotN/(4*pi)*sum(myBz,2);
 
 B = [Bx,By,Bz];
 

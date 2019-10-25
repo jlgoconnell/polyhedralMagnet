@@ -5,7 +5,7 @@
 %
 % Inputs:
 % vertices: An (n x 3) matrix of coordinates of the polyhedron vertices.
-% mag: A (1 x 3) magnetisation vector in Teslas.
+% mag: A (1 x 3) magnetisation vector in A/m.
 % obspt: An (n x 3) matrix of coordinates for which the field is to be
 % calculated at.
 %
@@ -24,7 +24,7 @@ if nargin < 4
 end
 [Ver,~] = surfToMesh(vertices(:,1),vertices(:,2),vertices(:,3));
 norms = meshFaceNormals(Ver,Fac);
-MdotN = 1/(pi*4e-7)*dot(repmat(mag,size(norms,1),1)',norms')';
+MdotN = dot(repmat(mag,size(norms,1),1)',norms')';
 Fac = Fac(abs(MdotN)>eps);
 norms = meshFaceNormals(Ver,Fac);
 
