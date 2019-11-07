@@ -38,9 +38,13 @@ for i = 1:length(Fac)
     n = norms(i,:)/norm(norms(i,:));
     m = sqrt(n(2)^2+n(3)^2);
     sg = (n(3)>0)*2-1; % sign() function such that sign(0) = 1
-    R = [m,            0,          sg*n(1);...
-         -n(1)*n(2)/m, sg*n(3)/m,  sg*n(2);...
-         -n(1)*n(3)/m, -sg*n(2)/m, abs(n(3))];
+    if m < eps % Special case when a y-rotation of 90deg is needed
+        R = [0,0,1;0,1,0;-1,0,0];
+    else
+        R = [m,            0,          sg*n(1);...
+             -n(1)*n(2)/m, sg*n(3)/m,  sg*n(2);...
+             -n(1)*n(3)/m, -sg*n(2)/m, sg*n(3)];
+    end
     Rn = R';
     facepts = facepts*R;
     thisz = facepts(1,3);

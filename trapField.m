@@ -45,26 +45,26 @@ Y = c+m.*xq-y;
 Z = zd-z;
 R = sqrt(X.^2+Y.^2+Z.^2);
 S = X+m.*Y+sqrt(1+m.^2).*R;
-T = R-Y;
-U = (X.*Y-m.*(X.^2+Z.^2))./(Z.*R);
+T = R+Y;
+U = (m.*(X.^2+Z.^2)-X.*Y)./(Z.*R);
 
 % Singularity treatment:
 
 % If S = 0:
-indS = (abs(Z)<eps) & (abs(Y-m.*X)<eps) & (X<=0);
-S(indS) = 1./X(indS);
+indS = (abs(Z)<eps) & (abs(Y-m.*X)<eps) & (X<0);
+S(indS) = 1./R(indS);
 
 % If T = 0:
-indT = (abs(Z)<eps) & (abs(X)<eps) & (Y>=0);
-T(indT) = 1./Y(indT);
+indT = (abs(Z)<eps) & (abs(X)<eps) & (Y<0);
+T(indT) = 1./R(indT);
 
 % If U = 0/0:
 indU = (abs(Z)<eps) & ((abs(X)<eps) | (abs(Y-m.*X)<eps));
 U(indU) = 0;
 
-myBx = -(-1).^(p+q).*(m./sqrt(1+m.^2).*log(S)+log(T));
+myBx = (-1).^(p+q).*(log(T)-m./sqrt(1+m.^2).*log(S));
 myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
-myBz = -(-1).^(p+q).*atan(U);
+myBz = (-1).^(p+q).*atan(U);
 
 Bx = mu0MdotN/(4*pi)*sum(myBx,2);
 By = mu0MdotN/(4*pi)*sum(myBy,2);
