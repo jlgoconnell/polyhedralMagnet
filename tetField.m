@@ -28,24 +28,27 @@ for fac = 1:4
     z = cross(facverts(2,:)-facverts(1,:),facverts(3,:)-facverts(1,:));
     tempvec = vertices(fac+3,:)-vertices(fac+2,:);
     z = -sign(myDot(z,tempvec))*z/norm(z); % Make sure it's outward-facing
-    AB = facverts(2,:)-facverts(1,:);
-    AC = facverts(3,:)-facverts(1,:);
-    thing = myDot(AC,cross(z,AB))
-    if thing < 0
-        y = AB;
-    else
-        y = AC;
-    end
-    y = y/norm(y);
-    x = cross(y,z);
-    R = [x',y',z'];
-    
-    % Solve field for each face
     MdotN = myDot(mag,z);
-    trappts = round(facverts*R,10);
-    trappts = (trappts([1:3,3],:))
-    Btemp = trapField(trappts,MdotN,obspt*R);
-    B = B + Btemp*R';
+    if abs(MdotN) > eps
+        AB = facverts(2,:)-facverts(1,:);
+        AC = facverts(3,:)-facverts(1,:);
+        thing = det([z;AC;AB]);
+        if thing > 0
+            y = AB;
+        else
+            y = AC;
+            facverts = [facverts(1,:);facverts(3,:);facverts(2,:)];
+        end
+        y = y/norm(y);
+        x = cross(y,z);
+        R = [x',y',z'];
+
+        % Solve field for each face
+        trappts = round(facverts([1:3,3],:)*R,10);
+        obsptr = obspt*R;
+        Btemp = trapField(trappts,MdotN,obsptr);
+        B = B + Btemp*R';
+    end
 end
 
 
