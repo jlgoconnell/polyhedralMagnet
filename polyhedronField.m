@@ -37,7 +37,7 @@ for i = 1:length(Fac)
     % Rotate the face to be parallel to the XY plane
     n = norms(i,:)/norm(norms(i,:));
     m = sqrt(n(2)^2+n(3)^2);
-    sg = (n(3)>0)*2-1; % sign() function such that sign(0) = 1
+    sg = 1;%(n(3)>0)*2-1; % sign() function such that sign(0) = 1
     if m < eps % Special case when a y-rotation of 90deg is needed
         R = [0,0,1;0,1,0;-1,0,0];
     else
