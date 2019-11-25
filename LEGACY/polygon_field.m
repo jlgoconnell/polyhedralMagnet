@@ -44,12 +44,12 @@ for tri = 1:numTri
     y2 = X(2,2);
     
     MdotN = myDot(M,n);
-    %if MdotN > 0
+    if abs(MdotN) > 0
         B = mu0*myDot(M,n)/(4*pi)*b_field_tri(x1,0,z_off,y1,y2)*[cos(-theta),...
             -sin(-theta),0;sin(-theta),cos(-theta),0;0,0,1];
-    %else
-    %    B = [0;0;0];
-    %end
+    else
+       B = [0;0;0];
+    end
     Bx = Bx + B(1);
     By = By + B(2);
     Bz = Bz + B(3);

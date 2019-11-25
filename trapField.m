@@ -7,7 +7,7 @@
 % be calculated, this can have one vertex repeated. The vertices must be
 % ordered from smaller x value to larger x value, then from smaller y to
 % larger y when x values are equal.
-% MdotN: A scalar representing the magnetic charge density in Teslas.
+% MdotN: A scalar representing the magnetic charge density in A/m.
 % obspt: An (n x 3) matrix of coordinates which the magnetic field will be
 % calculated at.
 % 
