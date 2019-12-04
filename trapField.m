@@ -70,9 +70,8 @@ Bx = mu0MdotN/(4*pi)*sum(myBx,2);
 By = mu0MdotN/(4*pi)*sum(myBy,2);
 Bz = mu0MdotN/(4*pi)*sum(myBz,2);
 
-if abs(Z) < eps
-    Bz = abs(Bz);
-end
+% This makes the B-field correct on the surface of a magnet:
+Bz(abs(Z)<eps) = abs(Bz(abs(Z)<eps));
 
 B = [Bx,By,Bz];
 
