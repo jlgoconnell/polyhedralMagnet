@@ -1,0 +1,1 @@
+This folder is the code for the paper "Analytic Magnetic Fields and Semi-Analytic Forces and Torques Due to General Polyhedral Permanent Magnets".
