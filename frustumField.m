@@ -19,7 +19,7 @@ Y = y(:);
 obspt = [X,Y,repmat(Z,size(X))];
 
 % Calculate the contributions from the surfaces:
-theta = atan(2*h/(L-l));
+theta = atan2(2*h,(L-l));
 R = [cos(theta),0,-sin(theta);0,1,0;sin(theta),0,cos(theta)];
 slapts = [-L/2,-L/2,-h;-L/2,L/2,-h;-l/2,-l/2,0;-l/2,l/2,0]*R;
 slaobs = obspt*R;
