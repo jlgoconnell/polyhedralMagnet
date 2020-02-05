@@ -6,22 +6,24 @@
 
 function B = frustumField(l,L,h,magn,XY,Z,n)
 
-vertices = [l/2,l/2,0;l/2,-l/2,0;-l/2,l/2,0;-l/2,-l/2,0;...
-    L/2,L/2,-h;L/2,-L/2,-h;-L/2,L/2,-h;-L/2,-L/2,-h];
+vertices = [L/2,L/2,0;L/2,-L/2,0;-L/2,L/2,0;-L/2,-L/2,0;...
+    l/2,l/2,-h;l/2,-l/2,-h;-l/2,l/2,-h;-l/2,-l/2,-h];
 
-slanteddensity = (L-l)/2/sqrt(((L-l)/2)^2+h^2)*magn;
+slanteddensity = (l-L)/2/sqrt(((l-L)/2)^2+h^2)*magn;
 
 x = linspace(-XY/2,XY/2,n);
 y = x';
-[x,y] = meshgrid(x,y);
+z = Z;
+[x,y,z] = meshgrid(x,y,z);
 X = x(:);
 Y = y(:);
-obspt = [X,Y,repmat(Z,size(X))];
+Z = z(:);
+obspt = [X,Y,Z];
 
 % Calculate the contributions from the surfaces:
-theta = atan2(2*h,(L-l));
+theta = atan2(2*h,(l-L));
 R = [cos(theta),0,-sin(theta);0,1,0;sin(theta),0,cos(theta)];
-slapts = [-L/2,-L/2,-h;-L/2,L/2,-h;-l/2,-l/2,0;-l/2,l/2,0]*R;
+slapts = [-l/2,-l/2,-h;-l/2,l/2,-h;-L/2,-L/2,0;-L/2,L/2,0]*R;
 slaobs = obspt*R;
 
 Btop = trapField(vertices([4,3,2,1],:),magn,obspt);
