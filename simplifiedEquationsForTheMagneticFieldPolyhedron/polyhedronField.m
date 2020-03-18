@@ -32,7 +32,7 @@ norms = meshFaceNormals(Ver,Fac);
 for i = 1:length(Fac)
     
     facepts = Ver(Fac{i},:);
-    facepts = round(facepts,8);
+    facepts = round(facepts,14);
     
     % Rotate the face to be parallel to the XY plane
     n = norms(i,:)/norm(norms(i,:));
