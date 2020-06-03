@@ -1,2 +1,7 @@
 
 *.asv
+*.exe
+*.o
+*.cbp
+*.depend
+*.layout
