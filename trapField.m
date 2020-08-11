@@ -49,7 +49,6 @@ T = R+Y;
 U = (m.*(X.^2+Z.^2)-X.*Y)./(Z.*R);
 
 % Singularity treatment:
-
 % If S = 0:
 indS = (abs(Z)<eps) & (abs(Y-m.*X)<eps) & (X<0);
 S(indS) = 1./R(indS);
@@ -62,9 +61,14 @@ T(indT) = 1./R(indT);
 indU = (abs(Z)<eps) & ((abs(X)<eps) | (abs(Y-m.*X)<eps));
 U(indU) = 0;
 
-myBx = (-1).^(p+q).*(log(T)-m./sqrt(1+m.^2).*log(S));
-myBy = (-1).^(p+q)./sqrt(1+m.^2).*log(S);
-myBz = (-1).^(p+q).*atan(U);
+% Calculate the field:
+logS = log(S);
+logT = log(T);
+atanU = atan(U);
+sqrt1plusm = sqrt(1+m.^2);
+myBx = (-1).^(p+q).*(logT-m./sqrt1plusm.*logS);
+myBy = (-1).^(p+q)./sqrt1plusm.*logS;
+myBz = (-1).^(p+q).*atanU;
 
 Bx = mu0MdotN/(4*pi)*sum(myBx,2);
 By = mu0MdotN/(4*pi)*sum(myBy,2);
