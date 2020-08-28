@@ -38,13 +38,14 @@ q = [1,1,2,2];
 m = repmat(m,1,2);
 c = repmat(c,1,2);
 xq = [x1,x1,x2,x2];
+sqrt1plusm = sqrt(1+m.^2);
 
 % Set up intermediate variables
 X = xq-x;
 Y = c+m.*xq-y;
 Z = zd-z;
 R = sqrt(X.^2+Y.^2+Z.^2);
-S = X+m.*Y+sqrt(1+m.^2).*R;
+S = X+m.*Y+sqrt1plusm.*R;
 T = R+Y;
 U = (m.*(X.^2+Z.^2)-X.*Y)./(Z.*R);
 
@@ -65,7 +66,6 @@ U(indU) = 0;
 logS = log(S);
 logT = log(T);
 atanU = atan(U);
-sqrt1plusm = sqrt(1+m.^2);
 myBx = (-1).^(p+q).*(logT-m./sqrt1plusm.*logS);
 myBy = (-1).^(p+q)./sqrt1plusm.*logS;
 myBz = (-1).^(p+q).*atanU;

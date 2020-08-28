@@ -4,7 +4,7 @@
 
 function B = triangleField(vertices,sigma,obspt)
 
-B = zeros(size(obspt));
+% B = zeros(size(obspt));
 
 % Calculate rotation matrix
 pt1 = vertices(1,:);
