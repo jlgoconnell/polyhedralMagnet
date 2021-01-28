@@ -19,6 +19,7 @@
 function B = trapField(vertices,MdotN,obspt)
 
 mu0MdotN = 4*pi*10^(-7)*MdotN;
+myeps = sqrt(eps);
 
 % Get point and line information
 x1 = vertices(1,1);
@@ -51,16 +52,22 @@ U = (m.*(X.^2+Z.^2)-X.*Y)./(Z.*R);
 
 % Singularity treatment:
 % If S = 0:
-indS = (abs(Z)<eps) & (abs(Y-m.*X)<eps) & (X<0);
-S(indS) = 1./R(indS);
+if any(abs(Z)<myeps) && any(any(abs(Y-m.*X)<myeps)) && any(any(X<0))
+    indS = (abs(Z)<myeps) & (abs(Y-m.*X)<myeps) & (X<0);
+    S(indS) = 1./R(indS);
+end
 
 % If T = 0:
-indT = (abs(Z)<eps) & (abs(X)<eps) & (Y<0);
-T(indT) = 1./R(indT);
+if any(abs(Z)<myeps) && any(any(abs(X)<myeps)) && any(any(Y<0))
+    indT = (abs(Z)<myeps) & (abs(X)<myeps) & (Y<0);
+    T(indT) = 1./R(indT);
+end
 
 % If U = 0/0:
-indU = (abs(Z)<eps) & ((abs(X)<eps) | (abs(Y-m.*X)<eps));
-U(indU) = 0;
+if any(abs(Z)<myeps) && (any(any(abs(X)<myeps)) || any(any(abs(Y-m.*X)<myeps)))
+    indU = (abs(Z)<myeps) & ((abs(X)<myeps) | (abs(Y-m.*X)<myeps));
+    U(indU) = 0;
+end
 
 % Calculate the field:
 logS = log(S);
@@ -75,7 +82,7 @@ By = mu0MdotN/(4*pi)*sum(myBy,2);
 Bz = mu0MdotN/(4*pi)*sum(myBz,2);
 
 % This makes the B-field correct on the surface of a magnet:
-Bz(abs(Z)<1000*eps) = abs(Bz(abs(Z)<1000*eps));
+% Bz(abs(Z)<1000*eps) = abs(Bz(abs(Z)<1000*eps));
 
 B = [Bx,By,Bz];
 
